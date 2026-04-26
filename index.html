@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Salesforce Apex — The Ultimate Beginner's Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0d1117;
+    --surface:   #161b22;
+    --surface2:  #1e2530;
+    --border:    #30363d;
+    --accent:    #58a6ff;
+    --accent2:   #3fb950;
+    --accent3:   #f78166;
+    --accent4:   #d2a8ff;
+    --accent5:   #ffa657;
+    --text:      #e6edf3;
+    --muted:     #8b949e;
+    --heading:   #ffffff;
+    --tag-bg:    rgba(88,166,255,0.12);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Lora', Georgia, serif;
+    font-size: 17px;
+    line-height: 1.85;
+  }
+
+  /* ── HERO ── */
+  .hero {
+    background: linear-gradient(135deg, #0d1117 0%, #0f2027 40%, #101c2e 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 80px 24px 64px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(88,166,255,0.18) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--tag-bg);
+    border: 1px solid rgba(88,166,255,0.3);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: .12em;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.1;
+    margin-bottom: 20px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    max-width: 640px;
+    margin: 0 auto 32px;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+  .toc-pills {
+    display: flex; flex-wrap: wrap; gap: 8px; justify-content: center;
+    max-width: 700px; margin: 0 auto;
+  }
+  .toc-pills a {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 12px;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .toc-pills a:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── LAYOUT ── */
+  .wrapper { max-width: 860px; margin: 0 auto; padding: 0 24px 100px; }
+
+  /* ── SECTION ── */
+  .section {
+    margin-top: 72px;
+    padding-top: 72px;
+    border-top: 1px solid var(--border);
+  }
+  .section:first-child { border-top: none; }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .15em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 800;
+    color: var(--heading);
+    line-height: 1.15;
+    margin-bottom: 20px;
+  }
+  .section h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--heading);
+    margin: 36px 0 12px;
+  }
+  .section h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent5);
+    margin: 24px 0 8px;
+  }
+  .section p { margin-bottom: 16px; }
+
+  /* ── ANALOGY CARD ── */
+  .analogy {
+    background: linear-gradient(135deg, rgba(63,185,80,.08), rgba(63,185,80,.03));
+    border: 1px solid rgba(63,185,80,.3);
+    border-left: 4px solid var(--accent2);
+    border-radius: 8px;
+    padding: 18px 22px;
+    margin: 24px 0;
+  }
+  .analogy-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .12em;
+    color: var(--accent2);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+
+  /* ── NOTE CARD ── */
+  .note {
+    background: rgba(255,166,87,.07);
+    border: 1px solid rgba(255,166,87,.25);
+    border-left: 4px solid var(--accent5);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: .92rem;
+  }
+  .note strong { color: var(--accent5); }
+
+  /* ── WARNING ── */
+  .warning {
+    background: rgba(247,129,102,.07);
+    border: 1px solid rgba(247,129,102,.25);
+    border-left: 4px solid var(--accent3);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: .92rem;
+  }
+  .warning strong { color: var(--accent3); }
+
+  /* ── CODE BLOCK ── */
+  .code-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+    font-size: .88rem;
+  }
+  .code-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 8px 16px;
+    display: flex; align-items: center; gap: 10px;
+  }
+  .code-dots { display: flex; gap: 6px; }
+  .code-dots span {
+    width: 10px; height: 10px; border-radius: 50%;
+  }
+  .code-dots span:nth-child(1) { background: #ff5f57; }
+  .code-dots span:nth-child(2) { background: #ffbd2e; }
+  .code-dots span:nth-child(3) { background: #28ca41; }
+  .code-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 4px;
+  }
+  pre {
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'JetBrains Mono', monospace;
+    line-height: 1.7;
+    tab-size: 4;
+  }
+  /* Syntax colours */
+  .kw  { color: #ff7b72; }   /* keywords: public, class, void, if, etc. */
+  .ty  { color: #79c0ff; }   /* types: String, Integer, Boolean, List */
+  .cm  { color: #8b949e; font-style: italic; } /* comments */
+  .st  { color: #a5d6ff; }   /* strings */
+  .nm  { color: #ffa657; }   /* numbers */
+  .fn  { color: #d2a8ff; }   /* function / method names */
+  .cls { color: #e3b341; }   /* class names */
+  .op  { color: #ff7b72; }   /* operators */
+
+  /* ── OUTPUT BLOCK ── */
+  .output-wrap {
+    background: #020d14;
+    border: 1px solid #1e3a4c;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: -12px 0 20px;
+  }
+  .output-header {
+    background: #071520;
+    border-bottom: 1px solid #1e3a4c;
+    padding: 6px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: #2ea043;
+    letter-spacing: .1em;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .output-header::before { content: '▶'; font-size: 9px; }
+  .output-wrap pre {
+    color: #56d364;
+    padding: 14px 20px;
+  }
+
+  /* ── TABLE ── */
+  .tbl-wrap { overflow-x: auto; margin: 20px 0; border-radius: 8px; border: 1px solid var(--border); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: var(--surface2);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .8rem;
+    color: var(--accent);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: .9rem;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: rgba(255,255,255,.02); }
+  td code, th code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .83em;
+    background: rgba(88,166,255,.1);
+    padding: 1px 6px;
+    border-radius: 3px;
+    color: var(--accent);
+  }
+
+  /* ── INLINE CODE ── */
+  p code, li code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .84em;
+    background: rgba(88,166,255,.1);
+    padding: 1px 7px;
+    border-radius: 4px;
+    color: var(--accent);
+  }
+
+  /* ── COMPARISON GRID ── */
+  .compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 20px 0;
+  }
+  @media(max-width:600px){ .compare-grid { grid-template-columns: 1fr; } }
+  .compare-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+  .compare-card h5 {
+    font-family: 'Syne', sans-serif;
+    font-size: .9rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+  }
+  .compare-card.good { border-color: rgba(63,185,80,.4); }
+  .compare-card.good h5 { color: var(--accent2); }
+  .compare-card.bad  { border-color: rgba(247,129,102,.4); }
+  .compare-card.bad  h5 { color: var(--accent3); }
+
+  /* ── TAG CHIP ── */
+  .chip {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .75rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin: 2px 3px 2px 0;
+  }
+  .chip-blue  { background: rgba(88,166,255,.12); color: var(--accent);  border: 1px solid rgba(88,166,255,.25); }
+  .chip-green { background: rgba(63,185,80,.12);  color: var(--accent2); border: 1px solid rgba(63,185,80,.25); }
+  .chip-red   { background: rgba(247,129,102,.12);color: var(--accent3); border: 1px solid rgba(247,129,102,.25); }
+  .chip-purple{ background: rgba(210,168,255,.12);color: var(--accent4); border: 1px solid rgba(210,168,255,.25); }
+  .chip-orange{ background: rgba(255,166,87,.12); color: var(--accent5); border: 1px solid rgba(255,166,87,.25); }
+
+  /* ── LIMIT TABLE highlight ── */
+  .limit-high { color: var(--accent3); font-weight: 600; }
+  .limit-med  { color: var(--accent5); font-weight: 600; }
+
+  /* ── SCROLL PROGRESS ── */
+  #progress {
+    position: fixed; top: 0; left: 0;
+    height: 3px; background: var(--accent);
+    z-index: 999; width: 0; transition: width .1s linear;
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<div class="hero">
+  <div class="hero-badge">// Module 11 · Salesforce Apex</div>
+  <h1>The <span>Complete Apex</span> Survival Guide</h1>
+  <p>Zero prior knowledge? Perfect. This guide takes you from "What is Apex?" to writing real, production-quality code — with examples, output, and plain-English explanations every step of the way.</p>
+  <div class="toc-pills">
+    <a href="#apex-basics">1. Apex & Data Types</a>
+    <a href="#sobjects">2. sObjects</a>
+    <a href="#dml">3. DML Statements</a>
+    <a href="#static">4. Static Vars & Methods</a>
+    <a href="#properties">5. Apex Properties</a>
+    <a href="#classes">6. Extending a Class</a>
+    <a href="#interface">7. Interfaces</a>
+    <a href="#sharing">8. With/Without Sharing</a>
+    <a href="#limits">9. Governor Limits</a>
+  </div>
+</div>
+
+<div class="wrapper">
+
+<!-- ════════════ 1. WHAT IS APEX + DATA TYPES ════════════ -->
+<section class="section" id="apex-basics">
+  <div class="section-label">// Unit 11.1</div>
+  <h2>🚀 What is Apex? And What Are Data Types?</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Think of Salesforce as a giant, pre-built house. You live in it comfortably — CRM, contacts, accounts, leads — all there. But what if you want to add a secret room? Or make the door open only when it rains? <strong>Apex is the custom builder</strong> you hire to do exactly that. It's the programming language that lets you add custom logic inside Salesforce.
+  </div>
+
+  <p>Apex is a <strong>strongly-typed, object-oriented programming language</strong> created by Salesforce. It runs <em>on Salesforce's servers</em>, not on your computer. That's why you don't need to install anything — you just write it in the Salesforce Developer Console and it runs in the cloud.</p>
+
+  <h3>📦 Data Types — "The kind of box you use to store something"</h3>
+  <p>Every piece of information in Apex needs to be stored in a <strong>variable</strong>. A variable is just a named box. The <strong>data type</strong> tells Apex what kind of thing the box can hold — numbers, text, yes/no answers, etc.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Data Type</th><th>Stores</th><th>Example</th></tr>
+    <tr><td><code>String</code></td><td>Text / words</td><td><code>'Hello World'</code></td></tr>
+    <tr><td><code>Integer</code></td><td>Whole numbers</td><td><code>42</code></td></tr>
+    <tr><td><code>Long</code></td><td>Very large whole numbers</td><td><code>9999999999L</code></td></tr>
+    <tr><td><code>Double</code></td><td>Decimal numbers</td><td><code>3.14</code></td></tr>
+    <tr><td><code>Decimal</code></td><td>Precise decimal (money!)</td><td><code>199.99</code></td></tr>
+    <tr><td><code>Boolean</code></td><td>True or False only</td><td><code>true</code> / <code>false</code></td></tr>
+    <tr><td><code>Date</code></td><td>Calendar date</td><td><code>Date.today()</code></td></tr>
+    <tr><td><code>DateTime</code></td><td>Date + time</td><td><code>DateTime.now()</code></td></tr>
+    <tr><td><code>Id</code></td><td>Salesforce record ID</td><td><code>'0012w000008lHxM'</code></td></tr>
+    <tr><td><code>List&lt;T&gt;</code></td><td>Ordered collection of items</td><td><code>List&lt;String&gt;</code></td></tr>
+    <tr><td><code>Set&lt;T&gt;</code></td><td>Unique items, no duplicates</td><td><code>Set&lt;Integer&gt;</code></td></tr>
+    <tr><td><code>Map&lt;K,V&gt;</code></td><td>Key → Value pairs</td><td><code>Map&lt;String, Integer&gt;</code></td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">DataTypesDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// STRING — stores any text, wrapped in single quotes
+// ─────────────────────────────────────────────</span>
+<span class="ty">String</span> firstName = <span class="st">'Rahul'</span>;
+<span class="ty">String</span> lastName  = <span class="st">'Sharma'</span>;
+
+<span class="cm">// You can join strings using + (this is called concatenation)</span>
+<span class="ty">String</span> fullName  = firstName + <span class="st">' '</span> + lastName;
+System.<span class="fn">debug</span>(<span class="st">'Full Name: '</span> + fullName);
+
+<span class="cm">// ─────────────────────────────────────────────
+// INTEGER — whole numbers, no decimals
+// ─────────────────────────────────────────────</span>
+<span class="ty">Integer</span> age     = <span class="nm">25</span>;
+<span class="ty">Integer</span> score   = <span class="nm">100</span>;
+<span class="ty">Integer</span> total   = age + score;
+System.<span class="fn">debug</span>(<span class="st">'Total: '</span> + total);     <span class="cm">// 125</span>
+
+<span class="cm">// ─────────────────────────────────────────────
+// DOUBLE — decimal numbers
+// ─────────────────────────────────────────────</span>
+<span class="ty">Double</span> price    = <span class="nm">999.50</span>;
+<span class="ty">Double</span> discount = <span class="nm">0.10</span>;  <span class="cm">// 10%</span>
+<span class="ty">Double</span> finalAmt = price - (price * discount);
+System.<span class="fn">debug</span>(<span class="st">'After Discount: '</span> + finalAmt);   <span class="cm">// 899.55</span>
+
+<span class="cm">// ─────────────────────────────────────────────
+// BOOLEAN — only true or false, used for conditions
+// ─────────────────────────────────────────────</span>
+<span class="ty">Boolean</span> isLoggedIn = <span class="kw">true</span>;
+<span class="ty">Boolean</span> isPremium  = <span class="kw">false</span>;
+System.<span class="fn">debug</span>(<span class="st">'Is user logged in? '</span> + isLoggedIn);
+
+<span class="cm">// ─────────────────────────────────────────────
+// DATE — only the calendar date, no time
+// ─────────────────────────────────────────────</span>
+<span class="ty">Date</span> today     = <span class="ty">Date</span>.<span class="fn">today</span>();
+<span class="ty">Date</span> nextWeek  = today.<span class="fn">addDays</span>(<span class="nm">7</span>);
+System.<span class="fn">debug</span>(<span class="st">'Today: '</span>    + today);
+System.<span class="fn">debug</span>(<span class="st">'Next Week: '</span> + nextWeek);
+
+<span class="cm">// ─────────────────────────────────────────────
+// LIST — an ordered collection (like a shopping list)
+// ─────────────────────────────────────────────</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; fruits = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt;{ <span class="st">'Mango'</span>, <span class="st">'Apple'</span>, <span class="st">'Banana'</span> };
+fruits.<span class="fn">add</span>(<span class="st">'Grapes'</span>);           <span class="cm">// Add an item at the end</span>
+System.<span class="fn">debug</span>(<span class="st">'First fruit: '</span> + fruits[<span class="nm">0</span>]); <span class="cm">// Mango (index starts at 0!)</span>
+System.<span class="fn">debug</span>(<span class="st">'Total fruits: '</span> + fruits.<span class="fn">size</span>());
+
+<span class="cm">// ─────────────────────────────────────────────
+// MAP — like a dictionary: key → value
+// ─────────────────────────────────────────────</span>
+<span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; scores = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt;{
+    <span class="st">'Rahul'</span> => <span class="nm">95</span>,
+    <span class="st">'Priya'</span> => <span class="nm">88</span>,
+    <span class="st">'Amit'</span>  => <span class="nm">76</span>
+};
+System.<span class="fn">debug</span>(<span class="st">"Rahul's score: "</span> + scores.<span class="fn">get</span>(<span class="st">'Rahul'</span>));  <span class="cm">// 95</span>
+
+<span class="cm">// ─────────────────────────────────────────────
+// SET — like a List, but NO DUPLICATES allowed
+// ─────────────────────────────────────────────</span>
+<span class="ty">Set</span>&lt;<span class="ty">String</span>&gt; uniqueColors = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">String</span>&gt;{ <span class="st">'Red'</span>, <span class="st">'Blue'</span>, <span class="st">'Red'</span> };
+<span class="cm">// Even though 'Red' was added twice, Set removes duplicates automatically</span>
+System.<span class="fn">debug</span>(<span class="st">'Colors: '</span> + uniqueColors);    <span class="cm">// {Blue, Red} — only 2 items!</span></pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT (Debug Log)</div>
+<pre>Full Name: Rahul Sharma
+Total: 125
+After Discount: 899.55
+Is user logged in? true
+Today: 2026-04-26
+Next Week: 2026-05-03
+First fruit: Mango
+Total fruits: 4
+Rahul's score: 95
+Colors: {Blue, Red}</pre>
+  </div>
+
+  <div class="note"><strong>💡 Remember:</strong> In Apex, <code>System.debug()</code> is your best friend. It prints values to the debug log — just like <code>console.log()</code> in JavaScript or <code>print()</code> in Python. Use it all the time while learning!</div>
+</section>
+
+<!-- ════════════ 2. sOBJECTS ════════════ -->
+<section class="section" id="sobjects">
+  <div class="section-label">// Unit 11.2</div>
+  <h2>🗄️ What Are sObjects?</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Imagine Salesforce is a big warehouse. Every shelf in that warehouse holds a type of record — one shelf for Accounts, one for Contacts, one for Opportunities. An <strong>sObject is a single row from one of those shelves</strong>. The "s" stands for Salesforce Object. When you want to work with a Salesforce record in Apex, you load it into an sObject variable.
+  </div>
+
+  <p>Salesforce stores data in <strong>objects</strong> (like database tables). Standard objects include <code>Account</code>, <code>Contact</code>, <code>Lead</code>, <code>Opportunity</code>. You can also create <strong>custom objects</strong> (e.g., <code>Student__c</code>). In Apex, every record is represented as an <strong>sObject</strong>.</p>
+
+  <h3>📌 Creating an sObject Variable</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">sObjectDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// WAY 1: Create and set fields one by one
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> acc1 = <span class="kw">new</span> <span class="ty">Account</span>();     <span class="cm">// Create an empty Account sObject</span>
+acc1.Name    = <span class="st">'Tata Motors'</span>;      <span class="cm">// Set the Name field</span>
+acc1.Phone   = <span class="st">'9999988888'</span>;      <span class="cm">// Set the Phone field</span>
+acc1.Industry = <span class="st">'Automotive'</span>;     <span class="cm">// Set the Industry field</span>
+System.<span class="fn">debug</span>(<span class="st">'Account: '</span> + acc1);
+
+<span class="cm">// ─────────────────────────────────────────────
+// WAY 2: Set fields right when you create (inline)
+// Cleaner and shorter — preferred way!
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> acc2 = <span class="kw">new</span> <span class="ty">Account</span>(
+    Name     = <span class="st">'Reliance Industries'</span>,
+    Phone    = <span class="st">'8888877777'</span>,
+    Industry = <span class="st">'Energy'</span>
+);
+System.<span class="fn">debug</span>(<span class="st">'Account 2: '</span> + acc2.Name);
+
+<span class="cm">// ─────────────────────────────────────────────
+// WAY 3: Working with Contact (has a relationship to Account)
+// ─────────────────────────────────────────────</span>
+<span class="ty">Contact</span> c = <span class="kw">new</span> <span class="ty">Contact</span>(
+    FirstName = <span class="st">'Priya'</span>,
+    LastName  = <span class="st">'Mehta'</span>,
+    Email     = <span class="st">'priya@example.com'</span>
+);
+System.<span class="fn">debug</span>(<span class="st">'Contact: '</span> + c.FirstName + <span class="st">' '</span> + c.LastName);
+
+<span class="cm">// ─────────────────────────────────────────────
+// WAY 4: Generic sObject (when you don't know the type at design time)
+// Think of it as a "general purpose" container
+// ─────────────────────────────────────────────</span>
+<span class="ty">sObject</span> genericObj = <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Generic Corp'</span>);
+System.<span class="fn">debug</span>(<span class="st">'Generic: '</span> + genericObj.<span class="fn">get</span>(<span class="st">'Name'</span>));  <span class="cm">// Must use .get()</span>
+
+<span class="cm">// ─────────────────────────────────────────────
+// WAY 5: Querying an existing record from database (SOQL)
+// Read it as: "SELECT these fields FROM this object WHERE condition"
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> existingAcc = [
+    <span class="kw">SELECT</span> Id, Name, Phone
+    <span class="kw">FROM</span>   <span class="ty">Account</span>
+    <span class="kw">WHERE</span>  Name = <span class="st">'Tata Motors'</span>
+    <span class="kw">LIMIT</span>  <span class="nm">1</span>
+];
+System.<span class="fn">debug</span>(<span class="st">'Found: '</span> + existingAcc.Name + <span class="st">' | ID: '</span> + existingAcc.Id);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Account: Account:{Name=Tata Motors, Phone=9999988888, Industry=Automotive}
+Account 2: Reliance Industries
+Contact: Priya Mehta
+Generic: Generic Corp
+Found: Tata Motors | ID: 0012w000008lHxMAA2</pre>
+  </div>
+
+  <div class="note"><strong>🔑 Key Rule:</strong> Just creating an sObject in Apex does <em>NOT</em> save it to the database. Think of it as filling out a paper form. You still need to <strong>submit the form</strong> — that's what DML (next section!) does.</div>
+</section>
+
+<!-- ════════════ 3. DML ════════════ -->
+<section class="section" id="dml">
+  <div class="section-label">// Unit 11.3</div>
+  <h2>💾 DML Statements — Saving, Updating & Deleting Records</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    You've filled out a form (sObject). Now <strong>DML (Data Manipulation Language)</strong> is the post office. <code>insert</code> = mailing a new application. <code>update</code> = sending a correction. <code>delete</code> = shredding the form. <code>upsert</code> = "update if it exists, otherwise create a new one."
+  </div>
+
+  <h3>🔵 The 5 DML Operations</h3>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">DML_Operations.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// 1. INSERT — Create a brand new record
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> newAcc = <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Infosys Ltd'</span>, Phone = <span class="st">'7777766666'</span>);
+<span class="kw">insert</span> newAcc;    <span class="cm">// Saves to database. After this, newAcc.Id is populated!</span>
+System.<span class="fn">debug</span>(<span class="st">'New Account ID: '</span> + newAcc.Id);
+
+<span class="cm">// ─────────────────────────────────────────────
+// 2. UPDATE — Modify an existing record
+// You MUST have the Id to update
+// ─────────────────────────────────────────────</span>
+newAcc.Phone = <span class="st">'1234567890'</span>;   <span class="cm">// Change the phone number</span>
+<span class="kw">update</span> newAcc;                 <span class="cm">// Push the change to database</span>
+System.<span class="fn">debug</span>(<span class="st">'Updated Phone: '</span> + newAcc.Phone);
+
+<span class="cm">// ─────────────────────────────────────────────
+// 3. DELETE — Remove a record permanently
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> toDelete = [<span class="kw">SELECT</span> Id <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">WHERE</span> Name = <span class="st">'OldCompany'</span> <span class="kw">LIMIT</span> <span class="nm">1</span>];
+<span class="kw">delete</span> toDelete;
+System.<span class="fn">debug</span>(<span class="st">'Deleted successfully'</span>);
+
+<span class="cm">// ─────────────────────────────────────────────
+// 4. UPSERT — Update OR Insert (whichever applies)
+// If a matching record exists → update it
+// If no match found          → create a new one
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> maybeNew = <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Wipro'</span>, Phone = <span class="st">'5555544444'</span>);
+<span class="kw">upsert</span> maybeNew;   <span class="cm">// If Wipro exists, update; otherwise create</span>
+System.<span class="fn">debug</span>(<span class="st">'Upserted: '</span> + maybeNew.Id);
+
+<span class="cm">// ─────────────────────────────────────────────
+// 5. UNDELETE — Restore a deleted record from the Recycle Bin
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> restored = [<span class="kw">SELECT</span> Id <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">WHERE</span> Name = <span class="st">'OldCompany'</span>
+                     <span class="kw">ALL ROWS</span>];   <span class="cm">// ALL ROWS includes deleted records</span>
+<span class="kw">undelete</span> restored;
+System.<span class="fn">debug</span>(<span class="st">'Restored!'</span>);</pre>
+  </div>
+
+  <h3>🟡 Bulk DML — Always Do It This Way!</h3>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Imagine you need to send 200 parcels. Would you go to the post office 200 times (once per parcel)? No! You'd take all 200 in one trip. <strong>Bulk DML = one trip to the post office for all records.</strong> Salesforce allows max 150 DML statements per transaction — so always batch your records into a list!
+  </div>
+
+  <div class="compare-grid">
+    <div class="compare-card bad">
+      <h5>❌ Bad — DML inside a loop</h5>
+<pre style="font-size:.78rem; color: #f78166;">for(Integer i=0; i&lt;10; i++) {
+  Account a = new Account(
+    Name='Acc'+i);
+  insert a; // 10 DML calls!
+}</pre>
+    </div>
+    <div class="compare-card good">
+      <h5>✅ Good — Bulk DML with List</h5>
+<pre style="font-size:.78rem; color: #3fb950;">List&lt;Account&gt; accs =
+  new List&lt;Account&gt;();
+for(Integer i=0; i&lt;10; i++) {
+  accs.add(new Account(Name='Acc'+i));
+}
+insert accs; // Only 1 DML call!</pre>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">BulkDML.apex</span></div>
+<pre><span class="cm">// Create a list to hold all new accounts</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accountList = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt;();
+
+<span class="cm">// Loop and build the list — do NOT insert inside the loop!</span>
+<span class="kw">for</span> (<span class="ty">Integer</span> i = <span class="nm">1</span>; i <= <span class="nm">5</span>; i++) {
+    accountList.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Account</span>(
+        Name    = <span class="st">'Company '</span> + i,
+        Phone   = <span class="st">'900000000'</span> + i,
+        Industry = <span class="st">'Technology'</span>
+    ));
+}
+
+<span class="cm">// One single DML call inserts ALL 5 accounts at once — EFFICIENT!</span>
+<span class="kw">insert</span> accountList;
+
+<span class="cm">// After insert, each item in the list now has its Id populated</span>
+<span class="kw">for</span> (<span class="ty">Account</span> a : accountList) {
+    System.<span class="fn">debug</span>(<span class="st">'Inserted: '</span> + a.Name + <span class="st">' → ID: '</span> + a.Id);
+}
+System.<span class="fn">debug</span>(<span class="st">'Total DML statements used: 1 (bulk!)'</span>);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Inserted: Company 1 → ID: 0012w000001AAAA
+Inserted: Company 2 → ID: 0012w000001BBBB
+Inserted: Company 3 → ID: 0012w000001CCCC
+Inserted: Company 4 → ID: 0012w000001DDDD
+Inserted: Company 5 → ID: 0012w000001EEEE
+Total DML statements used: 1 (bulk!)</pre>
+  </div>
+
+  <h3>🔵 Upsert in Detail — The Smart Insert/Update</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UpsertDemo.apex</span></div>
+<pre><span class="cm">// Scenario: You receive a list of leads from an external system.
+// Some might already exist (by external ID), some might be new.
+// UPSERT handles both cases in a single statement!</span>
+
+<span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; contacts = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt;{
+    <span class="kw">new</span> <span class="ty">Contact</span>(FirstName=<span class="st">'Amit'</span>,  LastName=<span class="st">'Shah'</span>,  Email=<span class="st">'amit@ex.com'</span>),
+    <span class="kw">new</span> <span class="ty">Contact</span>(FirstName=<span class="st">'Deepa'</span>, LastName=<span class="st">'Nair'</span>,  Email=<span class="st">'deepa@ex.com'</span>),
+    <span class="kw">new</span> <span class="ty">Contact</span>(FirstName=<span class="st">'Vijay'</span>, LastName=<span class="st">'Rajan'</span>, Email=<span class="st">'vijay@ex.com'</span>)
+};
+
+<span class="cm">// upsert on Email field — if contact with same email exists, update it
+// if no match found, insert a new one</span>
+<span class="kw">upsert</span> contacts <span class="ty">Contact</span>.Email;
+
+<span class="kw">for</span>(<span class="ty">Contact</span> c : contacts) {
+    System.<span class="fn">debug</span>(c.FirstName + <span class="st">' — ID: '</span> + c.Id);
+}</pre>
+  </div>
+
+  <h3>🔴 DML Exception Handling — Always Be Prepared!</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">DMLException.apex</span></div>
+<pre><span class="cm">// What if the DML fails? (e.g., required field missing, duplicate, etc.)
+// You need try-catch to handle it gracefully instead of crashing</span>
+
+<span class="ty">Account</span> badAccount = <span class="kw">new</span> <span class="ty">Account</span>();   <span class="cm">// Name is REQUIRED but we're not setting it!</span>
+
+<span class="kw">try</span> {
+    <span class="cm">// Try to insert — this will FAIL because Name is required</span>
+    <span class="kw">insert</span> badAccount;
+    System.<span class="fn">debug</span>(<span class="st">'Insert worked!'</span>);    <span class="cm">// This line will NOT run</span>
+
+} <span class="kw">catch</span> (<span class="ty">DmlException</span> e) {
+    <span class="cm">// This block runs when something goes wrong with DML</span>
+    System.<span class="fn">debug</span>(<span class="st">'DML Failed!'</span>);
+    System.<span class="fn">debug</span>(<span class="st">'Error Message: '</span> + e.<span class="fn">getMessage</span>());
+    System.<span class="fn">debug</span>(<span class="st">'Which field: '</span>  + e.<span class="fn">getDmlFieldNames</span>(<span class="nm">0</span>));
+    System.<span class="fn">debug</span>(<span class="st">'Status code: '</span>  + e.<span class="fn">getDmlStatusCode</span>(<span class="nm">0</span>));
+
+} <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+    <span class="cm">// Generic catch — catches ANY other kind of error</span>
+    System.<span class="fn">debug</span>(<span class="st">'Unexpected error: '</span> + e.<span class="fn">getMessage</span>());
+
+} <span class="kw">finally</span> {
+    <span class="cm">// This block ALWAYS runs, whether error or not
+    // Good for cleanup code</span>
+    System.<span class="fn">debug</span>(<span class="st">'DML attempt finished.'</span>);
+}</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>DML Failed!
+Error Message: Insert failed. First exception on row 0; first error:
+REQUIRED_FIELD_MISSING, Required fields are missing: [Name]: [Name]
+Which field: [Name]
+Status code: REQUIRED_FIELD_MISSING
+DML attempt finished.</pre>
+  </div>
+
+  <h3>🟣 Database Methods — More Control Than Plain DML</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Regular DML is like submitting a batch of forms — if one form has an error, the <em>whole batch</em> is rejected. <strong>Database methods</strong> are like submitting them one-by-one with a form checker: even if 2 fail, the other 8 still get processed. You get a detailed report of what succeeded and what failed.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">DatabaseMethods.apex</span></div>
+<pre><span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accs = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt;{
+    <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Valid Company'</span>),    <span class="cm">// ✅ Will succeed</span>
+    <span class="kw">new</span> <span class="ty">Account</span>(),                          <span class="cm">// ❌ Will fail — no Name!</span>
+    <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Another Valid'</span>)     <span class="cm">// ✅ Will succeed</span>
+};
+
+<span class="cm">// Database.insert(list, allOrNone)
+// allOrNone = false → even if some fail, save the rest
+// allOrNone = true  → if ANY fail, roll back ALL (like plain DML)</span>
+<span class="ty">Database.SaveResult</span>[] results = <span class="ty">Database</span>.<span class="fn">insert</span>(accs, <span class="kw">false</span>);
+
+<span class="cm">// Loop through results to see what happened to each record</span>
+<span class="kw">for</span> (<span class="ty">Integer</span> i = <span class="nm">0</span>; i < results.<span class="fn">size</span>(); i++) {
+    <span class="ty">Database.SaveResult</span> sr = results[i];
+
+    <span class="kw">if</span> (sr.<span class="fn">isSuccess</span>()) {
+        System.<span class="fn">debug</span>(<span class="st">'Row '</span> + i + <span class="st">' SAVED. ID: '</span> + sr.<span class="fn">getId</span>());
+    } <span class="kw">else</span> {
+        <span class="kw">for</span> (<span class="ty">Database.Error</span> err : sr.<span class="fn">getErrors</span>()) {
+            System.<span class="fn">debug</span>(<span class="st">'Row '</span> + i + <span class="st">' FAILED: '</span> + err.<span class="fn">getMessage</span>());
+            System.<span class="fn">debug</span>(<span class="st">'Fields: '</span> + err.<span class="fn">getFields</span>());
+        }
+    }
+}</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Row 0 SAVED. ID: 0012w000001AAAA
+Row 1 FAILED: Required fields are missing: [Name]
+Fields: (Name)
+Row 2 SAVED. ID: 0012w000001BBBB</pre>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Method</th><th>Equivalent DML</th><th>Returns</th></tr>
+    <tr><td><code>Database.insert()</code></td><td><code>insert</code></td><td><code>SaveResult[]</code></td></tr>
+    <tr><td><code>Database.update()</code></td><td><code>update</code></td><td><code>SaveResult[]</code></td></tr>
+    <tr><td><code>Database.upsert()</code></td><td><code>upsert</code></td><td><code>UpsertResult[]</code></td></tr>
+    <tr><td><code>Database.delete()</code></td><td><code>delete</code></td><td><code>DeleteResult[]</code></td></tr>
+    <tr><td><code>Database.undelete()</code></td><td><code>undelete</code></td><td><code>UndeleteResult[]</code></td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ════════════ 4. STATIC ════════════ -->
+<section class="section" id="static">
+  <div class="section-label">// Unit 11.3</div>
+  <h2>📌 Static Variables &amp; Methods</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Imagine a school. Each classroom has its own whiteboard (instance variable — belongs to that room). But there's one announcement board in the hallway that <em>everyone</em> in the school shares (static variable — belongs to the class itself). If one student writes on the hallway board, every student in every classroom sees it.
+  </div>
+
+  <p>A <strong>static variable/method</strong> belongs to the <em>class</em>, not to any specific object. You don't need to create an instance (object) to use it — you just call it using the class name directly.</p>
+
+  <h3>Characteristics of Static Variables</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Feature</th><th>Static</th><th>Instance (Non-static)</th></tr>
+    <tr><td>Belongs to</td><td>The <em>class</em></td><td>Each individual <em>object</em></td></tr>
+    <tr><td>Memory</td><td>One copy per transaction</td><td>One copy per object</td></tr>
+    <tr><td>Access</td><td><code>ClassName.variable</code></td><td><code>objectRef.variable</code></td></tr>
+    <tr><td>Use case</td><td>Counters, flags, shared config</td><td>Object-specific data</td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">StaticDemo.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">OrderProcessor</span> {
+
+    <span class="cm">// STATIC variable — shared across ALL instances of this class
+    // Great for counting how many times something happened in a transaction
+    // Prevents trigger recursion (very common real-world use!)</span>
+    <span class="kw">public static</span> <span class="ty">Integer</span> orderCount = <span class="nm">0</span>;
+
+    <span class="cm">// STATIC flag — used to prevent recursive trigger calls</span>
+    <span class="kw">public static</span> <span class="ty">Boolean</span> isRunning = <span class="kw">false</span>;
+
+    <span class="cm">// INSTANCE variable — each OrderProcessor object has its own copy</span>
+    <span class="kw">public</span> <span class="ty">String</span> processorName;
+
+    <span class="cm">// STATIC METHOD — can call without creating an object
+    // Note: static methods can ONLY use static variables, not instance variables</span>
+    <span class="kw">public static</span> <span class="ty">void</span> <span class="fn">processOrder</span>(<span class="ty">String</span> itemName) {
+        <span class="kw">if</span> (!isRunning) {
+            isRunning = <span class="kw">true</span>;
+            orderCount++;   <span class="cm">// Increment shared counter</span>
+            System.<span class="fn">debug</span>(<span class="st">'Processing order #'</span> + orderCount + <span class="st">': '</span> + itemName);
+            isRunning = <span class="kw">false</span>;
+        } <span class="kw">else</span> {
+            System.<span class="fn">debug</span>(<span class="st">'Already running — skipping recursive call'</span>);
+        }
+    }
+
+    <span class="cm">// STATIC method — utility / helper (no object needed)</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">formatPrice</span>(<span class="ty">Decimal</span> amount) {
+        <span class="kw">return</span> <span class="st">'₹'</span> + amount.<span class="fn">setScale</span>(<span class="nm">2</span>);  <span class="cm">// Always 2 decimal places</span>
+    }
+
+    <span class="cm">// INSTANCE method — needs an object to call</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">introduce</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'I am processor: '</span> + processorName);
+    }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingStaticDemo.apex</span></div>
+<pre><span class="cm">// Call static method — NO object needed, just use class name!</span>
+<span class="cls">OrderProcessor</span>.<span class="fn">processOrder</span>(<span class="st">'Laptop'</span>);
+<span class="cls">OrderProcessor</span>.<span class="fn">processOrder</span>(<span class="st">'Phone'</span>);
+<span class="cls">OrderProcessor</span>.<span class="fn">processOrder</span>(<span class="st">'Tablet'</span>);
+
+<span class="cm">// Static variable holds the count across all calls</span>
+System.<span class="fn">debug</span>(<span class="st">'Total orders: '</span> + <span class="cls">OrderProcessor</span>.orderCount);  <span class="cm">// 3</span>
+
+<span class="cm">// Static utility method</span>
+<span class="ty">String</span> formatted = <span class="cls">OrderProcessor</span>.<span class="fn">formatPrice</span>(<span class="nm">1999.5</span>);
+System.<span class="fn">debug</span>(formatted);  <span class="cm">// ₹1999.50</span>
+
+<span class="cm">// Instance method NEEDS an object</span>
+<span class="cls">OrderProcessor</span> p1 = <span class="kw">new</span> <span class="cls">OrderProcessor</span>();
+p1.processorName = <span class="st">'Processor-A'</span>;
+p1.<span class="fn">introduce</span>();     <span class="cm">// I am processor: Processor-A</span>
+
+<span class="cls">OrderProcessor</span> p2 = <span class="kw">new</span> <span class="cls">OrderProcessor</span>();
+p2.processorName = <span class="st">'Processor-B'</span>;
+p2.<span class="fn">introduce</span>();     <span class="cm">// I am processor: Processor-B
+
+// Both p1 and p2 share the SAME orderCount (static!)
+// But each has their OWN processorName (instance)</span></pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Processing order #1: Laptop
+Processing order #2: Phone
+Processing order #3: Tablet
+Total orders: 3
+₹1999.50
+I am processor: Processor-A
+I am processor: Processor-B</pre>
+  </div>
+
+  <h3>🔧 Static Initialization Block</h3>
+  <p>A static initializer runs <em>once</em> when the class is first loaded — perfect for one-time setup like loading configuration data.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">StaticInitializer.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">Config</span> {
+
+    <span class="kw">public static</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt; settings;
+
+    <span class="cm">// STATIC INITIALIZATION BLOCK
+    // This runs ONCE when the class is first used
+    // Like a setup room that gets prepared before anyone walks in</span>
+    <span class="kw">static</span> {
+        settings = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">String</span>&gt;();
+        settings.<span class="fn">put</span>(<span class="st">'ENV'</span>,      <span class="st">'Production'</span>);
+        settings.<span class="fn">put</span>(<span class="st">'VERSION'</span>,  <span class="st">'2.5.1'</span>);
+        settings.<span class="fn">put</span>(<span class="st">'MAX_ROWS'</span>, <span class="st">'200'</span>);
+        System.<span class="fn">debug</span>(<span class="st">'Config loaded!'</span>);   <span class="cm">// Only prints once!</span>
+    }
+
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">get</span>(<span class="ty">String</span> key) {
+        <span class="kw">return</span> settings.<span class="fn">get</span>(key);
+    }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingConfig.apex</span></div>
+<pre>System.<span class="fn">debug</span>(<span class="cls">Config</span>.<span class="fn">get</span>(<span class="st">'ENV'</span>));      <span class="cm">// Production</span>
+System.<span class="fn">debug</span>(<span class="cls">Config</span>.<span class="fn">get</span>(<span class="st">'VERSION'</span>));  <span class="cm">// 2.5.1</span>
+<span class="cm">// Static block already ran — won't run again</span>
+System.<span class="fn">debug</span>(<span class="cls">Config</span>.<span class="fn">get</span>(<span class="st">'MAX_ROWS'</span>)); <span class="cm">// 200</span></pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Config loaded!
+Production
+2.5.1
+200</pre>
+  </div>
+</section>
+
+<!-- ════════════ 5. PROPERTIES ════════════ -->
+<section class="section" id="properties">
+  <div class="section-label">// Unit 11.4</div>
+  <h2>🔒 Apex Properties — Smart Variable Guards</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Think of a property as a <strong>security-checked locker</strong>. Instead of anyone being able to open the locker directly, you go through a <strong>receptionist (getter)</strong> who retrieves it for you, or a <strong>checker (setter)</strong> who validates before putting something in. This protects your data from being set to invalid values.
+  </div>
+
+  <p>A <strong>property</strong> wraps a private variable with <code>get</code> and <code>set</code> accessors. This is a core OOP concept called <em>encapsulation</em> — hide the internals, expose a clean interface.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">PropertiesDemo.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">BankAccount</span> {
+
+    <span class="cm">// Private variable — nobody outside can touch this directly</span>
+    <span class="kw">private</span> <span class="ty">Decimal</span> balance;
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // FULL PROPERTY — get and set with logic
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> Balance {
+        <span class="kw">get</span> {
+            <span class="cm">// Logic before returning the value</span>
+            System.<span class="fn">debug</span>(<span class="st">'Balance was accessed'</span>);
+            <span class="kw">return</span> balance;
+        }
+        <span class="kw">set</span> {
+            <span class="cm">// 'value' is the keyword for what's being assigned</span>
+            <span class="kw">if</span> (value < <span class="nm">0</span>) {
+                <span class="cm">// Guard: reject negative balances</span>
+                <span class="kw">throw new</span> <span class="ty">IllegalArgumentException</span>(<span class="st">'Balance cannot be negative!'</span>);
+            }
+            balance = value;
+        }
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // READ-ONLY PROPERTY — only has get, no set
+    // Outside code can READ it but NOT change it
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="ty">Boolean</span> IsRich {
+        <span class="kw">get</span> { <span class="kw">return</span> balance > <span class="nm">100000</span>; }
+        <span class="cm">// No 'set' block — this is READ-ONLY</span>
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // WRITE-ONLY PROPERTY — rarely used, but valid
+    // Someone can set a PIN but cannot read it back
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">private</span> <span class="ty">String</span> secretPin;
+    <span class="kw">public</span> <span class="ty">String</span> PIN {
+        <span class="kw">set</span> {
+            secretPin = value.<span class="fn">toUpperCase</span>();   <span class="cm">// Always store in uppercase</span>
+        }
+        <span class="cm">// No 'get' — write-only!</span>
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// AUTOMATIC PROPERTY — shorthand, no custom logic needed
+// Apex creates the private backing variable for you automatically
+// ─────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="cls">Person</span> {
+    <span class="cm">// Instead of writing get { return name; } set { name = value; }
+    // Automatic property does it in ONE LINE:</span>
+    <span class="kw">public</span> <span class="ty">String</span> Name  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">Integer</span> Age  { <span class="kw">get</span>; <span class="kw">set</span>; }
+    <span class="kw">public</span> <span class="ty">String</span> Email { <span class="kw">get</span>; <span class="kw">private set</span>; }  <span class="cm">// Public read, private write</span>
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingProperties.apex</span></div>
+<pre><span class="cls">BankAccount</span> myAcc = <span class="kw">new</span> <span class="cls">BankAccount</span>();
+
+myAcc.Balance = <span class="nm">50000</span>;                   <span class="cm">// Calls the SET block</span>
+System.<span class="fn">debug</span>(<span class="st">'Balance: '</span> + myAcc.Balance); <span class="cm">// Calls the GET block</span>
+System.<span class="fn">debug</span>(<span class="st">'Is rich? '</span> + myAcc.IsRich);  <span class="cm">// false (less than 100,000)</span>
+
+myAcc.Balance = <span class="nm">200000</span>;
+System.<span class="fn">debug</span>(<span class="st">'Is rich now? '</span> + myAcc.IsRich);  <span class="cm">// true!</span>
+
+<span class="kw">try</span> {
+    myAcc.Balance = <span class="op">-</span><span class="nm">500</span>;  <span class="cm">// SET block rejects this!</span>
+} <span class="kw">catch</span>(<span class="ty">Exception</span> e) {
+    System.<span class="fn">debug</span>(<span class="st">'Error: '</span> + e.<span class="fn">getMessage</span>());
+}
+
+<span class="cm">// Automatic properties</span>
+<span class="cls">Person</span> p = <span class="kw">new</span> <span class="cls">Person</span>();
+p.Name = <span class="st">'Ananya'</span>;
+p.Age  = <span class="nm">28</span>;
+System.<span class="fn">debug</span>(p.Name + <span class="st">' is '</span> + p.Age);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Balance was accessed
+Balance: 50000
+Is rich? false
+Balance was accessed
+Is rich now? true
+Error: Balance cannot be negative!
+Ananya is 28</pre>
+  </div>
+</section>
+
+<!-- ════════════ 6. CLASS INHERITANCE ════════════ -->
+<section class="section" id="classes">
+  <div class="section-label">// Unit 11.5</div>
+  <h2>🧬 Extending a Class — Inheritance</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A <strong>Vehicle</strong> can move, has a fuel tank, and makes a sound. A <strong>Car</strong> is a Vehicle, but it also has a trunk and a stereo. A <strong>Truck</strong> is also a Vehicle, but it has a cargo bay. <em>Inheritance</em> means Car and Truck <strong>inherit</strong> everything from Vehicle and then add their own extras. You don't rewrite "move" for every vehicle — you write it once in Vehicle.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">InheritanceDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// PARENT CLASS (also called Base Class or Super Class)
+// virtual = this class CAN be extended (subclassed)
+// ─────────────────────────────────────────────</span>
+<span class="kw">public virtual class</span> <span class="cls">Animal</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span> name;
+    <span class="kw">public</span> <span class="ty">Integer</span> age;
+
+    <span class="cm">// Constructor — sets up the object when you create it</span>
+    <span class="kw">public</span> <span class="cls">Animal</span>(<span class="ty">String</span> n, <span class="ty">Integer</span> a) {
+        name = n;
+        age  = a;
+    }
+
+    <span class="cm">// virtual method — child classes CAN override this</span>
+    <span class="kw">public virtual</span> <span class="ty">String</span> <span class="fn">speak</span>() {
+        <span class="kw">return</span> name + <span class="st">' makes a sound'</span>;
+    }
+
+    <span class="cm">// Regular method — child classes INHERIT this as-is</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">eat</span>() {
+        System.<span class="fn">debug</span>(name + <span class="st">' is eating 🍽️'</span>);
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// CHILD CLASS (also called Subclass or Derived Class)
+// extends Animal = Dog IS-A Animal, inherits everything
+// ─────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="cls">Dog</span> <span class="kw">extends</span> <span class="cls">Animal</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span> breed;
+
+    <span class="cm">// super() calls the PARENT class constructor</span>
+    <span class="kw">public</span> <span class="cls">Dog</span>(<span class="ty">String</span> n, <span class="ty">Integer</span> a, <span class="ty">String</span> b) {
+        <span class="kw">super</span>(n, a);   <span class="cm">// Run Animal's constructor first</span>
+        breed = b;
+    }
+
+    <span class="cm">// override = replace the parent's version with our own
+    // Dog has a specific sound — woof!</span>
+    <span class="kw">public override</span> <span class="ty">String</span> <span class="fn">speak</span>() {
+        <span class="kw">return</span> name + <span class="st">' says: Woof! 🐶'</span>;
+    }
+
+    <span class="cm">// New method only Dog has</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">fetch</span>() {
+        System.<span class="fn">debug</span>(name + <span class="st">' the '</span> + breed + <span class="st">' fetches the ball! 🎾'</span>);
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// ANOTHER CHILD — Cat also extends Animal
+// ─────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="cls">Cat</span> <span class="kw">extends</span> <span class="cls">Animal</span> {
+    <span class="kw">public</span> <span class="cls">Cat</span>(<span class="ty">String</span> n, <span class="ty">Integer</span> a) {
+        <span class="kw">super</span>(n, a);
+    }
+    <span class="kw">public override</span> <span class="ty">String</span> <span class="fn">speak</span>() {
+        <span class="kw">return</span> name + <span class="st">' says: Meow! 🐱'</span>;
+    }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingInheritance.apex</span></div>
+<pre><span class="cls">Dog</span> dog = <span class="kw">new</span> <span class="cls">Dog</span>(<span class="st">'Bruno'</span>, <span class="nm">3</span>, <span class="st">'Labrador'</span>);
+<span class="cls">Cat</span> cat = <span class="kw">new</span> <span class="cls">Cat</span>(<span class="st">'Whiskers'</span>, <span class="nm">5</span>);
+
+<span class="cm">// Dog has Animal's methods (inherited)</span>
+dog.<span class="fn">eat</span>();                        <span class="cm">// Inherited from Animal</span>
+
+<span class="cm">// Dog's overridden speak() (not Animal's version)</span>
+System.<span class="fn">debug</span>(dog.<span class="fn">speak</span>());       <span class="cm">// Bruno says: Woof!</span>
+
+<span class="cm">// Dog's own method</span>
+dog.<span class="fn">fetch</span>();
+
+<span class="cm">// Cat's speak</span>
+System.<span class="fn">debug</span>(cat.<span class="fn">speak</span>());       <span class="cm">// Whiskers says: Meow!</span>
+
+<span class="cm">// POLYMORPHISM — treating different subclasses as their parent type
+// We can store Dog and Cat in an Animal variable
+// Each one calls ITS OWN speak() method — this is polymorphism!</span>
+<span class="ty">List</span>&lt;<span class="cls">Animal</span>&gt; animals = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="cls">Animal</span>&gt;{ dog, cat };
+<span class="kw">for</span> (<span class="cls">Animal</span> a : animals) {
+    System.<span class="fn">debug</span>(a.<span class="fn">speak</span>());      <span class="cm">// Each animal speaks in its own way!</span>
+}</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Bruno is eating 🍽️
+Bruno says: Woof! 🐶
+Bruno the Labrador fetches the ball! 🎾
+Whiskers says: Meow! 🐱
+Bruno says: Woof! 🐶
+Whiskers says: Meow! 🐱</pre>
+  </div>
+
+  <div class="note"><strong>📌 Key OOP Terms decoded:</strong><br>
+  <strong>Inheritance</strong> = Child gets everything from parent automatically.<br>
+  <strong>Override</strong> = Child replaces parent's method with its own version.<br>
+  <strong>super()</strong> = Explicitly call the parent's constructor or method.<br>
+  <strong>Polymorphism</strong> = Same method name, different behaviour depending on object type.
+  </div>
+
+  <h3>🔴 Abstract Classes — A Half-Defined Blueprint</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">AbstractDemo.apex</span></div>
+<pre><span class="cm">// abstract class = a template you CANNOT instantiate directly
+// It forces child classes to provide their own implementation
+// Use it when: the parent has SOME common logic, but certain methods
+// MUST be customised by each child</span>
+
+<span class="kw">public abstract class</span> <span class="cls">Shape</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span> color;
+
+    <span class="cm">// Abstract method = no body here — child MUST implement it</span>
+    <span class="kw">public abstract</span> <span class="ty">Double</span> <span class="fn">calculateArea</span>();
+
+    <span class="cm">// Regular method — available to all children</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">describe</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'I am a '</span> + color + <span class="st">' shape. Area: '</span> + <span class="fn">calculateArea</span>());
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">Circle</span> <span class="kw">extends</span> <span class="cls">Shape</span> {
+    <span class="kw">public</span> <span class="ty">Double</span> radius;
+    <span class="kw">public</span> <span class="cls">Circle</span>(<span class="ty">Double</span> r, <span class="ty">String</span> c) { radius=r; color=c; }
+
+    <span class="cm">// MUST implement calculateArea or Apex gives a compile error!</span>
+    <span class="kw">public override</span> <span class="ty">Double</span> <span class="fn">calculateArea</span>() {
+        <span class="kw">return</span> <span class="ty">Math</span>.<span class="fn">PI</span> * radius * radius;
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">Rectangle</span> <span class="kw">extends</span> <span class="cls">Shape</span> {
+    <span class="kw">public</span> <span class="ty">Double</span> width, height;
+    <span class="kw">public</span> <span class="cls">Rectangle</span>(<span class="ty">Double</span> w, <span class="ty">Double</span> h, <span class="ty">String</span> c) {
+        width=w; height=h; color=c;
+    }
+    <span class="kw">public override</span> <span class="ty">Double</span> <span class="fn">calculateArea</span>() {
+        <span class="kw">return</span> width * height;
+    }
+}
+
+<span class="cm">// Usage</span>
+<span class="cls">Circle</span>    circ = <span class="kw">new</span> <span class="cls">Circle</span>(<span class="nm">5</span>, <span class="st">'Red'</span>);
+<span class="cls">Rectangle</span> rect = <span class="kw">new</span> <span class="cls">Rectangle</span>(<span class="nm">4</span>, <span class="nm">6</span>, <span class="st">'Blue'</span>);
+circ.<span class="fn">describe</span>();
+rect.<span class="fn">describe</span>();</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>I am a Red shape. Area: 78.53981633974483
+I am a Blue shape. Area: 24.0</pre>
+  </div>
+</section>
+
+<!-- ════════════ 7. INTERFACE ════════════ -->
+<section class="section" id="interface">
+  <div class="section-label">// Unit 11.6</div>
+  <h2>🔌 Interfaces — The Contract</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A wall socket is a <strong>contract</strong>: "Any plug that follows this shape can use me." Your phone charger, laptop charger, and fan all have different internals, but they all follow the socket contract. In Apex, an <strong>interface</strong> is a contract: "Any class that implements me <em>must</em> provide these methods." The implementation details can differ — the contract doesn't care how, just that it's done.
+  </div>
+
+  <p>Key differences between Abstract Class and Interface:</p>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Feature</th><th>Abstract Class</th><th>Interface</th></tr>
+    <tr><td>Can have method bodies?</td><td>Yes (some)</td><td>No — only signatures</td></tr>
+    <tr><td>Can have variables?</td><td>Yes</td><td>No</td></tr>
+    <tr><td>Multiple inheritance?</td><td>No (only 1 parent)</td><td>Yes (can implement many)</td></tr>
+    <tr><td>Keyword</td><td><code>extends</code></td><td><code>implements</code></td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">InterfaceDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// INTERFACE — a pure contract
+// Only method signatures (name, params, return type) — NO bodies
+// ─────────────────────────────────────────────</span>
+<span class="kw">public interface</span> <span class="cls">Payable</span> {
+    <span class="ty">Decimal</span> <span class="fn">calculatePayment</span>();        <span class="cm">// Must implement this</span>
+    <span class="ty">String</span>  <span class="fn">getPaymentSummary</span>();         <span class="cm">// Must implement this too</span>
+}
+
+<span class="kw">public interface</span> <span class="cls">Taxable</span> {
+    <span class="ty">Decimal</span> <span class="fn">calculateTax</span>(<span class="ty">Decimal</span> amount); <span class="cm">// Another contract</span>
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// A class can implement MULTIPLE interfaces
+// Just separate them with commas!
+// ─────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="cls">FreelanceInvoice</span> <span class="kw">implements</span> <span class="cls">Payable</span>, <span class="cls">Taxable</span> {
+
+    <span class="kw">public</span> <span class="ty">Decimal</span> hourlyRate;
+    <span class="kw">public</span> <span class="ty">Integer</span> hoursWorked;
+
+    <span class="kw">public</span> <span class="cls">FreelanceInvoice</span>(<span class="ty">Decimal</span> rate, <span class="ty">Integer</span> hours) {
+        hourlyRate   = rate;
+        hoursWorked  = hours;
+    }
+
+    <span class="cm">// Implementing Payable's calculatePayment()</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">calculatePayment</span>() {
+        <span class="kw">return</span> hourlyRate * hoursWorked;
+    }
+
+    <span class="cm">// Implementing Payable's getPaymentSummary()</span>
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getPaymentSummary</span>() {
+        <span class="kw">return</span> <span class="st">'Freelance: '</span> + hoursWorked + <span class="st">'hrs × ₹'</span> + hourlyRate
+               + <span class="st">' = ₹'</span> + <span class="fn">calculatePayment</span>();
+    }
+
+    <span class="cm">// Implementing Taxable's calculateTax()</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">calculateTax</span>(<span class="ty">Decimal</span> amount) {
+        <span class="kw">return</span> amount * <span class="nm">0.18</span>;    <span class="cm">// 18% GST</span>
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">SalaryInvoice</span> <span class="kw">implements</span> <span class="cls">Payable</span> {
+
+    <span class="kw">public</span> <span class="ty">Decimal</span> monthlySalary;
+    <span class="kw">public</span> <span class="ty">Decimal</span> bonus;
+
+    <span class="kw">public</span> <span class="cls">SalaryInvoice</span>(<span class="ty">Decimal</span> s, <span class="ty">Decimal</span> b) {
+        monthlySalary = s;
+        bonus = b;
+    }
+
+    <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">calculatePayment</span>() {
+        <span class="kw">return</span> monthlySalary + bonus;
+    }
+
+    <span class="kw">public</span> <span class="ty">String</span> <span class="fn">getPaymentSummary</span>() {
+        <span class="kw">return</span> <span class="st">'Salary ₹'</span> + monthlySalary + <span class="st">' + Bonus ₹'</span> + bonus
+               + <span class="st">' = ₹'</span> + <span class="fn">calculatePayment</span>();
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// POWER OF INTERFACE: treat different objects the same way!
+// Both FreelanceInvoice and SalaryInvoice are "Payable"
+// We can process them without knowing which one they are
+// ─────────────────────────────────────────────</span>
+<span class="kw">public static</span> <span class="ty">void</span> <span class="fn">processPayment</span>(<span class="cls">Payable</span> p) {
+    System.<span class="fn">debug</span>(p.<span class="fn">getPaymentSummary</span>());
+    System.<span class="fn">debug</span>(<span class="st">'Total due: ₹'</span> + p.<span class="fn">calculatePayment</span>());
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingInterface.apex</span></div>
+<pre><span class="cls">FreelanceInvoice</span> fi = <span class="kw">new</span> <span class="cls">FreelanceInvoice</span>(<span class="nm">500</span>, <span class="nm">40</span>);
+<span class="cls">SalaryInvoice</span>   si = <span class="kw">new</span> <span class="cls">SalaryInvoice</span>(<span class="nm">80000</span>, <span class="nm">10000</span>);
+
+<span class="fn">processPayment</span>(fi);   <span class="cm">// Works! FreelanceInvoice is Payable</span>
+<span class="fn">processPayment</span>(si);   <span class="cm">// Works! SalaryInvoice is also Payable</span>
+
+<span class="cm">// Tax only applies to Freelancers (they implement Taxable)</span>
+<span class="ty">Decimal</span> tax = fi.<span class="fn">calculateTax</span>(fi.<span class="fn">calculatePayment</span>());
+System.<span class="fn">debug</span>(<span class="st">'GST on freelance: ₹'</span> + tax);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Freelance: 40hrs × ₹500 = ₹20000
+Total due: ₹20000
+Salary ₹80000 + Bonus ₹10000 = ₹90000
+Total due: ₹90000
+GST on freelance: ₹3600.00</pre>
+  </div>
+</section>
+
+<!-- ════════════ 8. SHARING ════════════ -->
+<section class="section" id="sharing">
+  <div class="section-label">// Unit 11.7</div>
+  <h2>🛡️ With Sharing vs Without Sharing</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Your company has records marked "Manager-only." <br>
+    <strong>with sharing</strong> = The Apex class behaves like a normal employee. It respects the sharing rules. If you're not a manager, you can't see manager-only records.<br>
+    <strong>without sharing</strong> = The Apex class acts like a system admin — it ignores sharing rules and can see <em>everything</em>.<br>
+    <strong>inherited sharing</strong> = The class borrows whatever sharing context it was called from.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">SharingDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// WITH SHARING
+// Enforces the current user's sharing rules (OWD, role hierarchy, sharing rules)
+// A user only sees records they are allowed to see
+// USE THIS as the default — safest option!
+// ─────────────────────────────────────────────</span>
+<span class="kw">public with sharing class</span> <span class="cls">CustomerService</span> {
+
+    <span class="kw">public static</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; <span class="fn">getMyAccounts</span>() {
+        <span class="cm">// If logged-in user can only see 5 accounts (sharing rules),
+        // this query returns only those 5 — NOT all 1000 in the org!</span>
+        <span class="kw">return</span> [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span>];
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// WITHOUT SHARING
+// Ignores the user's sharing rules — runs in system mode
+// USE THIS only when absolutely necessary:
+// e.g., batch jobs, integrations, admin utilities
+// NEVER expose this to untrusted users!
+// ─────────────────────────────────────────────</span>
+<span class="kw">public without sharing class</span> <span class="cls">AdminService</span> {
+
+    <span class="kw">public static</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; <span class="fn">getAllAccounts</span>() {
+        <span class="cm">// Returns ALL accounts regardless of who is logged in
+        // Even records the user has no permission to see!</span>
+        <span class="kw">return</span> [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span>];
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// INHERITED SHARING
+// Inherits sharing context from the calling class
+// If called by a "with sharing" class → enforces sharing
+// If called by a "without sharing" class → ignores sharing
+// Best for utility classes used in both contexts
+// ─────────────────────────────────────────────</span>
+<span class="kw">public inherited sharing class</span> <span class="cls">UtilityService</span> {
+
+    <span class="kw">public static</span> <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; <span class="fn">getContacts</span>() {
+        <span class="cm">// Sharing behaviour depends on whoever called this method</span>
+        <span class="kw">return</span> [<span class="kw">SELECT</span> Id, FirstName, LastName <span class="kw">FROM</span> <span class="ty">Contact</span>];
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// REAL-WORLD PATTERN: Escalate privileges safely
+// The outer class enforces sharing (safe default).
+// The inner helper class runs without sharing for a specific operation.
+// ─────────────────────────────────────────────</span>
+<span class="kw">public with sharing class</span> <span class="cls">AccountManager</span> {
+
+    <span class="kw">public static</span> <span class="ty">Integer</span> <span class="fn">getAccountCount</span>() {
+        <span class="cm">// Normal users get limited count (with sharing)</span>
+        <span class="kw">return</span> [<span class="kw">SELECT COUNT</span>() <span class="kw">FROM</span> <span class="ty">Account</span>];
+    }
+
+    <span class="cm">// Inner class runs without sharing — only for specific admin task</span>
+    <span class="kw">private without sharing class</span> <span class="cls">AdminOps</span> {
+        <span class="kw">public</span> <span class="ty">Integer</span> <span class="fn">getTotalCount</span>() {
+            <span class="kw">return</span> [<span class="kw">SELECT COUNT</span>() <span class="kw">FROM</span> <span class="ty">Account</span>];   <span class="cm">// All records</span>
+        }
+    }
+}</pre>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Keyword</th><th>Sharing Rules?</th><th>When to Use</th></tr>
+    <tr><td><code>with sharing</code></td><td>✅ Enforced</td><td>Default — always start here. User sees only their records.</td></tr>
+    <tr><td><code>without sharing</code></td><td>❌ Ignored</td><td>Admin ops, batch jobs, integrations needing all data.</td></tr>
+    <tr><td><code>inherited sharing</code></td><td>Depends on caller</td><td>Reusable utility classes used in both contexts.</td></tr>
+    <tr><td>(no keyword)</td><td>❌ Ignored</td><td>Same as without sharing — avoid this ambiguity!</td></tr>
+  </table>
+  </div>
+
+  <div class="warning"><strong>⚠️ Security Warning:</strong> Never blindly use <code>without sharing</code> just to make a query work. It bypasses all data access controls and can expose sensitive records to unauthorised users. Always use <code>with sharing</code> by default and escalate only when there's a specific, justified reason.</div>
+</section>
+
+<!-- ════════════ 9. GOVERNOR LIMITS ════════════ -->
+<section class="section" id="limits">
+  <div class="section-label">// Unit 11.8</div>
+  <h2>⚡ Per-Transaction Apex Limits (Governor Limits)</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Salesforce runs in a shared cloud environment — thousands of companies sharing the same servers. Governor Limits are like <strong>fair-use rules at a shared buffet</strong>. You can take a reasonable amount of food (resources), but you can't hog everything and starve everyone else. Salesforce enforces these limits per transaction to keep the system fair and fast for all tenants.
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Limit</th><th>Per Transaction</th><th>What It Means</th></tr>
+    <tr><td>SOQL queries</td><td class="limit-high">100</td><td>Max 100 SELECT statements</td></tr>
+    <tr><td>Records returned by SOQL</td><td class="limit-high">50,000</td><td>Max 50K rows across all queries</td></tr>
+    <tr><td>DML statements</td><td class="limit-med">150</td><td>Max 150 insert/update/delete calls</td></tr>
+    <tr><td>Records per DML</td><td class="limit-high">10,000</td><td>Max 10K records in one DML call</td></tr>
+    <tr><td>CPU time</td><td class="limit-high">10,000 ms</td><td>10 seconds of code execution</td></tr>
+    <tr><td>Heap size</td><td class="limit-med">6 MB</td><td>Max memory your code can use</td></tr>
+    <tr><td>Callouts (HTTP)</td><td class="limit-med">100</td><td>Max 100 external API calls</td></tr>
+    <tr><td>Emails sent</td><td>10</td><td>Max 10 emails per transaction</td></tr>
+    <tr><td>Future methods</td><td>50</td><td>Async @future method calls</td></tr>
+  </table>
+  </div>
+
+  <h3>🔧 How to Check Limits at Runtime</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">GovernorLimits.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// Limits class — tells you how much you've used / have left
+// Great for debugging limit issues!
+// ─────────────────────────────────────────────</span>
+
+<span class="ty">Account</span>[] accs = [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">LIMIT</span> <span class="nm">10</span>];
+
+<span class="cm">// After running a SOQL, check how many you've used</span>
+System.<span class="fn">debug</span>(<span class="st">'SOQL queries used: '</span>      + Limits.<span class="fn">getQueries</span>());
+System.<span class="fn">debug</span>(<span class="st">'SOQL queries limit: '</span>     + Limits.<span class="fn">getLimitQueries</span>());
+System.<span class="fn">debug</span>(<span class="st">'SOQL rows retrieved: '</span>    + Limits.<span class="fn">getQueryRows</span>());
+System.<span class="fn">debug</span>(<span class="st">'DML statements used: '</span>    + Limits.<span class="fn">getDmlStatements</span>());
+System.<span class="fn">debug</span>(<span class="st">'DML statements limit: '</span>   + Limits.<span class="fn">getLimitDmlStatements</span>());
+System.<span class="fn">debug</span>(<span class="st">'CPU time used (ms): '</span>     + Limits.<span class="fn">getCpuTime</span>());
+System.<span class="fn">debug</span>(<span class="st">'Heap used (bytes): '</span>      + Limits.<span class="fn">getHeapSize</span>());</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>SOQL queries used: 1
+SOQL queries limit: 100
+SOQL rows retrieved: 10
+DML statements used: 0
+DML statements limit: 150
+CPU time used (ms): 34
+Heap used (bytes): 8192</pre>
+  </div>
+
+  <h3>✅ Best Practices to Stay Under Limits</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">LimitBestPractices.apex</span></div>
+<pre><span class="cm">// ❌ BAD PATTERN — SOQL inside a loop
+// If there are 100 accounts, this runs 100 SOQL queries!
+// Will CRASH with "Too many SOQL queries: 101" error</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accounts = [<span class="kw">SELECT</span> Id <span class="kw">FROM</span> <span class="ty">Account</span>];
+<span class="kw">for</span>(<span class="ty">Account</span> a : accounts) {
+    <span class="cm">// DANGER! Query inside a loop!</span>
+    <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; contacts = [<span class="kw">SELECT</span> Id <span class="kw">FROM</span> <span class="ty">Contact</span>
+                               <span class="kw">WHERE</span> AccountId = :a.Id];
+}
+
+<span class="cm">// ✅ GOOD PATTERN — One query outside the loop
+// Get ALL contacts for ALL accounts in ONE query
+// Uses a Map to look up contacts by Account ID</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accs = [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span>];
+
+<span class="cm">// Collect all Account IDs into a Set</span>
+<span class="ty">Set</span>&lt;<span class="ty">Id</span>&gt; accIds = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt;(accs).<span class="fn">keySet</span>();
+
+<span class="cm">// ONE query to get all related contacts</span>
+<span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; allContacts = [<span class="kw">SELECT</span> Id, FirstName, AccountId
+                              <span class="kw">FROM</span> <span class="ty">Contact</span>
+                              <span class="kw">WHERE</span> AccountId <span class="kw">IN</span> :accIds];
+
+<span class="cm">// Build a map: accountId → list of contacts</span>
+<span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt;&gt; accToContacts = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt;&gt;();
+<span class="kw">for</span>(<span class="ty">Contact</span> c : allContacts) {
+    <span class="kw">if</span>(!accToContacts.<span class="fn">containsKey</span>(c.AccountId)) {
+        accToContacts.<span class="fn">put</span>(c.AccountId, <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt;());
+    }
+    accToContacts.<span class="fn">get</span>(c.AccountId).<span class="fn">add</span>(c);
+}
+
+<span class="cm">// Now loop — no SOQL inside!</span>
+<span class="kw">for</span>(<span class="ty">Account</span> a : accs) {
+    <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; contacts = accToContacts.<span class="fn">get</span>(a.Id);
+    System.<span class="fn">debug</span>(a.Name + <span class="st">' has '</span> + (contacts != <span class="kw">null</span> ? contacts.<span class="fn">size</span>() : <span class="nm">0</span>) + <span class="st">' contacts'</span>);
+}
+<span class="cm">// Total SOQL: 2 (one for accounts, one for contacts) — not 100+!</span></pre>
+  </div>
+
+  <div class="note">
+    <strong>📌 The Golden Rules of Governor Limits:</strong><br>
+    1. <strong>Never put SOQL inside a loop</strong> — query once, iterate over results.<br>
+    2. <strong>Never put DML inside a loop</strong> — collect records in a List, DML once.<br>
+    3. <strong>Use Maps for lookups</strong> — faster than looping and avoids extra queries.<br>
+    4. <strong>Use Limits class</strong> to monitor usage during development.<br>
+    5. <strong>Use Batch Apex</strong> for processing more than 50K records.
+  </div>
+</section>
+
+<!-- QUICK REFERENCE CHEAT SHEET -->
+<section class="section">
+  <div class="section-label">// Quick Reference</div>
+  <h2>🗒️ The Cheat Sheet — Everything at a Glance</h2>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Concept</th><th>What it is</th><th>Keyword / Syntax</th></tr>
+    <tr><td>Variable</td><td>Named storage box</td><td><code>String name = 'Rahul';</code></td></tr>
+    <tr><td>sObject</td><td>A Salesforce record in memory</td><td><code>Account a = new Account();</code></td></tr>
+    <tr><td>Insert</td><td>Create record in DB</td><td><code>insert acc;</code></td></tr>
+    <tr><td>Update</td><td>Modify existing record</td><td><code>update acc;</code></td></tr>
+    <tr><td>Upsert</td><td>Insert or Update</td><td><code>upsert acc;</code></td></tr>
+    <tr><td>Delete</td><td>Remove record</td><td><code>delete acc;</code></td></tr>
+    <tr><td>Database.insert</td><td>Partial success DML</td><td><code>Database.insert(list, false);</code></td></tr>
+    <tr><td>Static variable</td><td>Shared across all objects</td><td><code>public static Integer count;</code></td></tr>
+    <tr><td>Static method</td><td>Call without object</td><td><code>public static void run() {}</code></td></tr>
+    <tr><td>Property</td><td>Guarded variable access</td><td><code>public String Name { get; set; }</code></td></tr>
+    <tr><td>Inheritance</td><td>Child gets parent's stuff</td><td><code>class Dog extends Animal {}</code></td></tr>
+    <tr><td>Override</td><td>Replace parent's method</td><td><code>public override void speak() {}</code></td></tr>
+    <tr><td>Interface</td><td>Contract to implement</td><td><code>class X implements Y {}</code></td></tr>
+    <tr><td>with sharing</td><td>Respect user's data access</td><td><code>public with sharing class X {}</code></td></tr>
+    <tr><td>without sharing</td><td>Bypass sharing rules</td><td><code>public without sharing class X {}</code></td></tr>
+    <tr><td>Governor Limit</td><td>Max resources per transaction</td><td>100 SOQLs, 150 DMLs, etc.</td></tr>
+  </table>
+  </div>
+</section>
+
+</div><!-- /wrapper -->
+
+<script>
+  // scroll progress bar
+  window.addEventListener('scroll', () => {
+    const d = document.documentElement;
+    const s = d.scrollTop;
+    const h = d.scrollHeight - d.clientHeight;
+    document.getElementById('progress').style.width = (s/h*100) + '%';
+  });
+</script>
+</body>
+</html>
