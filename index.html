@@ -327,7 +327,97 @@
   .limit-high { color: var(--accent3); font-weight: 600; }
   .limit-med  { color: var(--accent5); font-weight: 600; }
 
-  /* ── SCROLL PROGRESS ── */
+  /* ── SIDEBAR TOC ── */
+  .sidebar-toc {
+    position: fixed;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 10px;
+    z-index: 100;
+    max-width: 160px;
+    display: none;
+  }
+  @media(min-width:1300px){ .sidebar-toc { display: block; } }
+  .sidebar-toc-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: .12em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-toc a {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-decoration: none;
+    padding: 3px 6px;
+    border-radius: 4px;
+    transition: all .15s;
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar-toc a:hover,
+  .sidebar-toc a.active { background: var(--tag-bg); color: var(--accent); }
+
+  /* ── STEP NUMBER ── */
+  .step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #000;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .85rem;
+    margin-right: 10px;
+    flex-shrink: 0;
+  }
+  .step-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 14px 0;
+  }
+  .step-row p { margin: 0; flex: 1; }
+
+  /* ── FLOW DIAGRAM ── */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 24px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: .78rem;
+  }
+  .flow-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 14px;
+    text-align: center;
+    min-width: 90px;
+  }
+  .flow-box span { display: block; font-size: 1.2rem; margin-bottom: 3px; }
+  .flow-box b { color: var(--accent); }
+  .flow-arrow {
+    color: var(--muted);
+    font-size: 1.2rem;
+    padding: 0 6px;
+  }
+
   #progress {
     position: fixed; top: 0; left: 0;
     height: 3px; background: var(--accent);
@@ -337,6 +427,27 @@
 </head>
 <body>
 <div id="progress"></div>
+
+<!-- Sticky sidebar TOC -->
+<nav class="sidebar-toc" id="sidenav">
+  <div class="sidebar-toc-title">// Contents</div>
+  <a href="#apex-basics">1. Apex &amp; Data Types</a>
+  <a href="#sobjects">2. sObjects</a>
+  <a href="#dml">3. DML</a>
+  <a href="#static">4. Static</a>
+  <a href="#properties">5. Properties</a>
+  <a href="#classes">6. Inheritance</a>
+  <a href="#interface">7. Interfaces</a>
+  <a href="#sharing">8. Sharing</a>
+  <a href="#limits">9. Gov Limits</a>
+  <a href="#oop-deep">10. OOP Deep</a>
+  <a href="#inner-classes">11. Inner/Enum</a>
+  <a href="#exceptions">12. Exceptions</a>
+  <a href="#collections">13. Collections</a>
+  <a href="#triggers">14. Triggers</a>
+  <a href="#how-it-all-connects">15. Big Picture</a>
+  <a href="#setup">16. Dev Setup</a>
+</nav>
 
 <!-- ════════════════════ HERO ════════════════════ -->
 <div class="hero">
@@ -353,6 +464,8 @@
     <a href="#interface">7. Interfaces</a>
     <a href="#sharing">8. With/Without Sharing</a>
     <a href="#limits">9. Governor Limits</a>
+    <a href="#oop-deep">10. OOP Deep Dive</a>
+    <a href="#setup">11. Full Dev Setup</a>
   </div>
 </div>
 
@@ -1567,7 +1680,1704 @@ Heap used (bytes): 8192</pre>
   </div>
 </section>
 
-</div><!-- /wrapper -->
+
+<!-- ════════════ OOP DEEP DIVE ════════════ -->
+<section class="section" id="oop-deep">
+  <div class="section-label">// OOP Deep Dive</div>
+  <h2>🧠 The Full OOP Picture — Everything You Actually Need</h2>
+  <p>Object-Oriented Programming (OOP) sounds fancy, but it's really just a way of organising code to mirror the real world. Let's cover every concept you'll encounter as a Salesforce developer — from <em>constructors</em> to <em>polymorphism</em> to <em>access modifiers</em>.</p>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 The Master Analogy</div>
+    Think of a <strong>class</strong> as a <em>blueprint for a house</em>. The blueprint describes what a house looks like, what rooms it has, what rules apply. An <strong>object</strong> is an actual house built from that blueprint. You can build 100 houses from the same blueprint — each one is independent, but they all follow the same design.
+  </div>
+
+  <!-- ── CONSTRUCTORS ── -->
+  <h3>🏗️ 1. Constructors — The "Birth" of an Object</h3>
+  <p>A <strong>constructor</strong> is a special method that runs <em>automatically</em> when you create an object with <code>new</code>. Its job is to set the object up with initial values. It always has <strong>the same name as the class</strong> and <strong>no return type</strong>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">ConstructorDemo.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">Student</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span>  name;
+    <span class="kw">public</span> <span class="ty">Integer</span> age;
+    <span class="kw">public</span> <span class="ty">String</span>  grade;
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // DEFAULT CONSTRUCTOR — no parameters
+    // Runs when you do: new Student()
+    // Sets safe default values
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="cls">Student</span>() {
+        name  = <span class="st">'Unknown'</span>;
+        age   = <span class="nm">0</span>;
+        grade = <span class="st">'N/A'</span>;
+        System.<span class="fn">debug</span>(<span class="st">'Default constructor called'</span>);
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // PARAMETERIZED CONSTRUCTOR — takes arguments
+    // Runs when you do: new Student('Rahul', 20, 'A')
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="cls">Student</span>(<span class="ty">String</span> n, <span class="ty">Integer</span> a, <span class="ty">String</span> g) {
+        name  = n;
+        age   = a;
+        grade = g;
+        System.<span class="fn">debug</span>(<span class="st">'Parameterized constructor called'</span>);
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // ANOTHER CONSTRUCTOR — partial info (name only)
+    // This is CONSTRUCTOR OVERLOADING — same class,
+    // different constructors with different signatures
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="cls">Student</span>(<span class="ty">String</span> n) {
+        name  = n;
+        age   = <span class="nm">18</span>;      <span class="cm">// sensible default age</span>
+        grade = <span class="st">'Pending'</span>;
+        System.<span class="fn">debug</span>(<span class="st">'Name-only constructor called'</span>);
+    }
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">display</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'Student → Name: '</span> + name
+                   + <span class="st">' | Age: '</span> + age
+                   + <span class="st">' | Grade: '</span> + grade);
+    }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">UsingConstructors.apex</span></div>
+<pre><span class="cm">// Using the DEFAULT constructor — no arguments needed</span>
+<span class="cls">Student</span> s1 = <span class="kw">new</span> <span class="cls">Student</span>();
+s1.<span class="fn">display</span>();
+
+<span class="cm">// Using the PARAMETERIZED constructor — pass all info upfront</span>
+<span class="cls">Student</span> s2 = <span class="kw">new</span> <span class="cls">Student</span>(<span class="st">'Priya'</span>, <span class="nm">21</span>, <span class="st">'A+'</span>);
+s2.<span class="fn">display</span>();
+
+<span class="cm">// Using the NAME-ONLY constructor — Apex picks the right one</span>
+<span class="cls">Student</span> s3 = <span class="kw">new</span> <span class="cls">Student</span>(<span class="st">'Rohan'</span>);
+s3.<span class="fn">display</span>();</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Default constructor called
+Student → Name: Unknown | Age: 0 | Grade: N/A
+Parameterized constructor called
+Student → Name: Priya | Age: 21 | Grade: A+
+Name-only constructor called
+Student → Name: Rohan | Age: 18 | Grade: Pending</pre>
+  </div>
+
+  <!-- ── this KEYWORD ── -->
+  <h3>🔑 2. The <code>this</code> Keyword — "I am talking about myself"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    When someone asks "what's your name?", you say "My name is…" — <em>my</em> refers to yourself. In Apex, when a method or constructor refers to the current object's own variable, it uses <code>this</code> to be clear: "I mean <em>this object's</em> variable, not the parameter."
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">ThisKeyword.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">Employee</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span>  name;   <span class="cm">// instance variable</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> salary;
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // Problem: constructor parameter has SAME name as the field
+    // Without 'this', Apex doesn't know which 'name' you mean!
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="cls">Employee</span>(<span class="ty">String</span> name, <span class="ty">Decimal</span> salary) {
+        <span class="cm">// 'this.name' = the OBJECT's field
+        // 'name'      = the CONSTRUCTOR's parameter</span>
+        <span class="kw">this</span>.name   = name;    <span class="cm">// Assign parameter to the object's field</span>
+        <span class="kw">this</span>.salary = salary;
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // 'this()' — call another constructor from within a constructor
+    // Avoids duplicating setup code!
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public</span> <span class="cls">Employee</span>(<span class="ty">String</span> name) {
+        <span class="kw">this</span>(name, <span class="nm">30000</span>);   <span class="cm">// Calls the 2-param constructor above!
+                              // Like saying: "do everything that one does,
+                              // but use a default salary of 30,000"</span>
+    }
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">applyRaise</span>(<span class="ty">Decimal</span> percent) {
+        <span class="cm">// 'this.salary' is clear — the OBJECT's salary field</span>
+        <span class="kw">this</span>.salary = <span class="kw">this</span>.salary + (<span class="kw">this</span>.salary * percent / <span class="nm">100</span>);
+    }
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">print</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'Employee: '</span> + <span class="kw">this</span>.name + <span class="st">' | ₹'</span> + <span class="kw">this</span>.salary);
+    }
+}
+
+<span class="cm">// Test it</span>
+<span class="cls">Employee</span> e1 = <span class="kw">new</span> <span class="cls">Employee</span>(<span class="st">'Sunita'</span>, <span class="nm">50000</span>);
+e1.<span class="fn">print</span>();
+e1.<span class="fn">applyRaise</span>(<span class="nm">10</span>);     <span class="cm">// 10% raise</span>
+e1.<span class="fn">print</span>();
+
+<span class="cls">Employee</span> e2 = <span class="kw">new</span> <span class="cls">Employee</span>(<span class="st">'Vikram'</span>);  <span class="cm">// Uses default salary 30,000</span>
+e2.<span class="fn">print</span>();</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Employee: Sunita | ₹50000
+Employee: Sunita | ₹55000.00
+Employee: Vikram | ₹30000</pre>
+  </div>
+
+  <!-- ── METHOD OVERLOADING ── -->
+  <h3>🔀 3. Method Overloading — "Same Name, Different Jobs"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A <em>chef</em> at a restaurant has one skill: <strong>cook()</strong>. But they cook differently depending on what you order — cook(pasta), cook(pizza), cook(salad). The name is the same, but the <em>ingredients and result</em> differ. That's overloading: same method name, different parameter signatures.
+  </div>
+
+  <p><strong>Overloading</strong> = same method name, different number or type of parameters. Apex figures out <em>at compile time</em> which version to call based on what you pass in. This is also called <strong>Compile-Time Polymorphism</strong>.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">MethodOverloading.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">MathHelper</span> {
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // add() — Version 1: two integers
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">Integer</span> <span class="fn">add</span>(<span class="ty">Integer</span> a, <span class="ty">Integer</span> b) {
+        System.<span class="fn">debug</span>(<span class="st">'add(Integer, Integer) called'</span>);
+        <span class="kw">return</span> a + b;
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // add() — Version 2: three integers
+    // Same name! Different number of params
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">Integer</span> <span class="fn">add</span>(<span class="ty">Integer</span> a, <span class="ty">Integer</span> b, <span class="ty">Integer</span> c) {
+        System.<span class="fn">debug</span>(<span class="st">'add(Integer, Integer, Integer) called'</span>);
+        <span class="kw">return</span> a + b + c;
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // add() — Version 3: two Decimals
+    // Same name! Different TYPE of params
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">Decimal</span> <span class="fn">add</span>(<span class="ty">Decimal</span> a, <span class="ty">Decimal</span> b) {
+        System.<span class="fn">debug</span>(<span class="st">'add(Decimal, Decimal) called'</span>);
+        <span class="kw">return</span> a + b;
+    }
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // describe() — Version 1: no params
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">describe</span>() {
+        <span class="kw">return</span> <span class="st">'I am a Math Helper!'</span>;
+    }
+
+    <span class="cm">// describe() — Version 2: with a prefix String</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">describe</span>(<span class="ty">String</span> prefix) {
+        <span class="kw">return</span> prefix + <span class="st">': I am a Math Helper!'</span>;
+    }
+
+    <span class="cm">// describe() — Version 3: with prefix + version number</span>
+    <span class="kw">public static</span> <span class="ty">String</span> <span class="fn">describe</span>(<span class="ty">String</span> prefix, <span class="ty">Integer</span> version) {
+        <span class="kw">return</span> prefix + <span class="st">' v'</span> + version + <span class="st">': I am a Math Helper!'</span>;
+    }
+}
+
+<span class="cm">// Apex picks the right version automatically based on what you pass</span>
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">add</span>(<span class="nm">5</span>, <span class="nm">3</span>) );          <span class="cm">// calls version 1 → 8</span>
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">add</span>(<span class="nm">5</span>, <span class="nm">3</span>, <span class="nm">2</span>) );       <span class="cm">// calls version 2 → 10</span>
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">add</span>(<span class="nm">2.5</span>, <span class="nm">3.1</span>) );      <span class="cm">// calls version 3 → 5.6</span>
+
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">describe</span>() );
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">describe</span>(<span class="st">'INFO'</span>) );
+System.<span class="fn">debug</span>( <span class="cls">MathHelper</span>.<span class="fn">describe</span>(<span class="st">'INFO'</span>, <span class="nm">2</span>) );</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>add(Integer, Integer) called
+8
+add(Integer, Integer, Integer) called
+10
+add(Decimal, Decimal) called
+5.6
+I am a Math Helper!
+INFO: I am a Math Helper!
+INFO v2: I am a Math Helper!</pre>
+  </div>
+
+  <div class="note"><strong>Overloading vs Overriding — the KEY difference:</strong><br>
+  <strong>Overloading</strong> = Same class, same method name, <em>different parameters</em>. Decided at <em>compile time</em>.<br>
+  <strong>Overriding</strong> = Parent + child class, same method name, <em>same parameters</em>. Decided at <em>runtime</em>.</div>
+
+  <!-- ── ENCAPSULATION ── -->
+  <h3>🔒 4. Encapsulation — "Hide the Wires, Show the Switch"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A TV remote has buttons you press (public interface). But the circuit board inside is hidden (private implementation). You don't need to know how the circuit works to change the channel. <strong>Encapsulation</strong> = hide the internal details, expose only what users need.
+  </div>
+
+  <h4>Access Modifiers — Who Can See What?</h4>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Modifier</th><th>Visible to</th><th>Use case</th></tr>
+    <tr><td><code>public</code></td><td>Any class anywhere</td><td>Methods/properties you want everyone to use</td></tr>
+    <tr><td><code>private</code></td><td>Only THIS class</td><td>Internal helpers, sensitive data — default for variables</td></tr>
+    <tr><td><code>protected</code></td><td>This class + child classes</td><td>Methods child classes need but outsiders shouldn't</td></tr>
+    <tr><td><code>global</code></td><td>Any class in any org/package</td><td>Managed packages, WebServices, Batch interfaces</td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">EncapsulationDemo.apex</span></div>
+<pre><span class="kw">public class</span> <span class="cls">BankVault</span> {
+
+    <span class="cm">// private — ONLY this class can see/change this
+    // Nobody from outside can do: vault.balance = 999999;
+    // They MUST go through the deposit/withdraw methods</span>
+    <span class="kw">private</span>   <span class="ty">Decimal</span> balance;
+    <span class="kw">private</span>   <span class="ty">String</span>  ownerPin;
+    <span class="kw">protected</span> <span class="ty">String</span>  ownerName;   <span class="cm">// subclasses can see this</span>
+
+    <span class="cm">// public constructor — anyone can create a vault</span>
+    <span class="kw">public</span> <span class="cls">BankVault</span>(<span class="ty">String</span> name, <span class="ty">String</span> pin, <span class="ty">Decimal</span> startAmount) {
+        <span class="kw">this</span>.ownerName = name;
+        <span class="kw">this</span>.ownerPin  = pin;       <span class="cm">// stored privately, never exposed</span>
+        <span class="kw">this</span>.balance   = startAmount;
+    }
+
+    <span class="cm">// public method — controlled way to deposit
+    // Validates: amount must be > 0</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">deposit</span>(<span class="ty">Decimal</span> amount) {
+        <span class="kw">if</span> (amount <= <span class="nm">0</span>) {
+            System.<span class="fn">debug</span>(<span class="st">'ERROR: Deposit amount must be positive!'</span>);
+            <span class="kw">return</span>;
+        }
+        balance += amount;
+        System.<span class="fn">debug</span>(ownerName + <span class="st">' deposited ₹'</span> + amount
+                   + <span class="st">'. New balance: ₹'</span> + balance);
+    }
+
+    <span class="cm">// public method — controlled withdrawal
+    // Validates: sufficient funds AND correct PIN</span>
+    <span class="kw">public</span> <span class="ty">Boolean</span> <span class="fn">withdraw</span>(<span class="ty">Decimal</span> amount, <span class="ty">String</span> pin) {
+        <span class="kw">if</span> (!<span class="fn">isValidPin</span>(pin)) {       <span class="cm">// calls our private helper</span>
+            System.<span class="fn">debug</span>(<span class="st">'ERROR: Wrong PIN!'</span>);
+            <span class="kw">return false</span>;
+        }
+        <span class="kw">if</span> (amount > balance) {
+            System.<span class="fn">debug</span>(<span class="st">'ERROR: Insufficient funds!'</span>);
+            <span class="kw">return false</span>;
+        }
+        balance -= amount;
+        System.<span class="fn">debug</span>(<span class="st">'Withdrew ₹'</span> + amount + <span class="st">'. Remaining: ₹'</span> + balance);
+        <span class="kw">return true</span>;
+    }
+
+    <span class="cm">// public read-only balance check (no PIN needed to see balance)</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">getBalance</span>() {
+        <span class="kw">return</span> balance;     <span class="cm">// controlled read — no write allowed</span>
+    }
+
+    <span class="cm">// PRIVATE helper — only used internally, NOT accessible outside
+    // No one outside can call vault.isValidPin() directly</span>
+    <span class="kw">private</span> <span class="ty">Boolean</span> <span class="fn">isValidPin</span>(<span class="ty">String</span> input) {
+        <span class="kw">return</span> ownerPin == input;
+    }
+}
+
+<span class="cm">// ─── Testing encapsulation ───</span>
+<span class="cls">BankVault</span> vault = <span class="kw">new</span> <span class="cls">BankVault</span>(<span class="st">'Rahul'</span>, <span class="st">'1234'</span>, <span class="nm">10000</span>);
+
+vault.<span class="fn">deposit</span>(<span class="nm">5000</span>);                    <span class="cm">// ✅ Allowed</span>
+vault.<span class="fn">deposit</span>(<span class="op">-</span><span class="nm">100</span>);                    <span class="cm">// ❌ Rejected by guard</span>
+vault.<span class="fn">withdraw</span>(<span class="nm">2000</span>, <span class="st">'9999'</span>);          <span class="cm">// ❌ Wrong PIN</span>
+vault.<span class="fn">withdraw</span>(<span class="nm">2000</span>, <span class="st">'1234'</span>);          <span class="cm">// ✅ Correct PIN</span>
+System.<span class="fn">debug</span>(<span class="st">'Balance: ₹'</span> + vault.<span class="fn">getBalance</span>());
+
+<span class="cm">// vault.balance = 999999;   ← COMPILE ERROR — private field!
+// vault.ownerPin = 'hacked'; ← COMPILE ERROR — private field!</span></pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Rahul deposited ₹5000. New balance: ₹15000
+ERROR: Deposit amount must be positive!
+ERROR: Wrong PIN!
+Withdrew ₹2000. Remaining: ₹13000
+Balance: ₹13000</pre>
+  </div>
+
+  <!-- ── POLYMORPHISM DEEP DIVE ── -->
+  <h3>🎭 5. Polymorphism — "One Interface, Many Forms"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    You press the <code>Play</code> button. On your music app it plays a song. On a video app it plays a movie. On a podcast app it plays an episode. <strong>Same button (same method call)</strong>, completely different behaviour depending on <em>what object</em> it's called on. That's polymorphism.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">PolymorphismDeepDive.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// TYPE 1: RUNTIME POLYMORPHISM (via Override)
+// The method to call is decided at RUNTIME, not compile time
+// ─────────────────────────────────────────────</span>
+
+<span class="kw">public virtual class</span> <span class="cls">Notification</span> {
+    <span class="kw">public</span> <span class="ty">String</span>  recipient;
+    <span class="kw">public</span> <span class="ty">String</span>  message;
+
+    <span class="kw">public</span> <span class="cls">Notification</span>(<span class="ty">String</span> to, <span class="ty">String</span> msg) {
+        <span class="kw">this</span>.recipient = to;
+        <span class="kw">this</span>.message   = msg;
+    }
+
+    <span class="cm">// Virtual — each child will override with its own delivery method</span>
+    <span class="kw">public virtual</span> <span class="ty">void</span> <span class="fn">send</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'Sending notification to: '</span> + recipient);
+    }
+
+    <span class="cm">// NOT overridden — shared by all</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">logAttempt</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'[LOG] Notification attempt for: '</span> + recipient);
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">EmailNotification</span> <span class="kw">extends</span> <span class="cls">Notification</span> {
+    <span class="kw">public</span> <span class="ty">String</span> subject;
+
+    <span class="kw">public</span> <span class="cls">EmailNotification</span>(<span class="ty">String</span> to, <span class="ty">String</span> sub, <span class="ty">String</span> msg) {
+        <span class="kw">super</span>(to, msg);
+        <span class="kw">this</span>.subject = sub;
+    }
+
+    <span class="kw">public override</span> <span class="ty">void</span> <span class="fn">send</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'📧 EMAIL → To: '</span> + recipient
+                   + <span class="st">' | Subject: '</span> + subject
+                   + <span class="st">' | Body: '</span>    + message);
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">SMSNotification</span> <span class="kw">extends</span> <span class="cls">Notification</span> {
+    <span class="kw">public</span> <span class="ty">String</span> phoneNumber;
+
+    <span class="kw">public</span> <span class="cls">SMSNotification</span>(<span class="ty">String</span> phone, <span class="ty">String</span> msg) {
+        <span class="kw">super</span>(phone, msg);
+        <span class="kw">this</span>.phoneNumber = phone;
+    }
+
+    <span class="kw">public override</span> <span class="ty">void</span> <span class="fn">send</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'📱 SMS → To: +91-'</span> + phoneNumber
+                   + <span class="st">' | Text: '</span>  + message);
+    }
+}
+
+<span class="kw">public class</span> <span class="cls">PushNotification</span> <span class="kw">extends</span> <span class="cls">Notification</span> {
+    <span class="kw">public</span> <span class="cls">PushNotification</span>(<span class="ty">String</span> userId, <span class="ty">String</span> msg) {
+        <span class="kw">super</span>(userId, msg);
+    }
+
+    <span class="kw">public override</span> <span class="ty">void</span> <span class="fn">send</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'🔔 PUSH → UserID: '</span> + recipient
+                   + <span class="st">' | Alert: '</span>  + message);
+    }
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// THE POWER OF POLYMORPHISM:
+// Put all different notification types in ONE list of the PARENT type.
+// Call send() on each — Apex automatically runs the RIGHT version!
+// You don't need to know which type each one is.
+// ─────────────────────────────────────────────</span>
+
+<span class="ty">List</span>&lt;<span class="cls">Notification</span>&gt; notifications = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="cls">Notification</span>&gt;{
+    <span class="kw">new</span> <span class="cls">EmailNotification</span>(<span class="st">'priya@example.com'</span>, <span class="st">'Your Order'</span>, <span class="st">'Shipped!'</span>),
+    <span class="kw">new</span> <span class="cls">SMSNotification</span>(<span class="st">'9876543210'</span>, <span class="st">'OTP: 445566'</span>),
+    <span class="kw">new</span> <span class="cls">PushNotification</span>(<span class="st">'user_001'</span>, <span class="st">'New message received'</span>)
+};
+
+<span class="cm">// Same loop, same method call — but each behaves differently!</span>
+<span class="kw">for</span> (<span class="cls">Notification</span> n : notifications) {
+    n.<span class="fn">logAttempt</span>();   <span class="cm">// Inherited — same for all</span>
+    n.<span class="fn">send</span>();         <span class="cm">// Polymorphic — each one is different!</span>
+    System.<span class="fn">debug</span>(<span class="st">'---'</span>);
+}</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>[LOG] Notification attempt for: priya@example.com
+📧 EMAIL → To: priya@example.com | Subject: Your Order | Body: Shipped!
+---
+[LOG] Notification attempt for: 9876543210
+📱 SMS → To: +91-9876543210 | Text: OTP: 445566
+---
+[LOG] Notification attempt for: user_001
+🔔 PUSH → UserID: user_001 | Alert: New message received
+---</pre>
+  </div>
+
+  <!-- ── TYPE CASTING ── -->
+  <h3>🔄 6. Type Casting — Changing the Variable's "Label"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    You have a box labelled "Animal." Inside it is actually a Dog. You know it's a Dog, but the box label says Animal. <strong>Casting</strong> is relabelling the box to say "Dog" so you can use Dog-specific features like <code>fetch()</code>.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">TypeCasting.apex</span></div>
+<pre><span class="cm">// Using Animal/Dog/Cat from our inheritance section</span>
+
+<span class="cm">// Widening cast (Upcasting) — always safe, done automatically
+// Dog IS-A Animal, so storing a Dog in an Animal variable is fine</span>
+<span class="cls">Animal</span> a = <span class="kw">new</span> <span class="cls">Dog</span>(<span class="st">'Bruno'</span>, <span class="nm">3</span>, <span class="st">'Labrador'</span>);
+System.<span class="fn">debug</span>(a.<span class="fn">speak</span>());     <span class="cm">// Woof! (Dog's version — polymorphism)</span>
+<span class="cm">// a.fetch();  ← COMPILE ERROR! Animal type has no fetch()</span>
+
+<span class="cm">// Narrowing cast (Downcasting) — need explicit cast to use child methods
+// You're telling Apex: "trust me, this Animal is actually a Dog"</span>
+<span class="cls">Dog</span> d = (<span class="cls">Dog</span>) a;        <span class="cm">// Cast Animal → Dog using (Dog) syntax</span>
+d.<span class="fn">fetch</span>();             <span class="cm">// ✅ Now you can use Dog-specific method!</span>
+
+<span class="cm">// SAFE casting with instanceof — check before casting!
+// Prevents ClassCastException at runtime</span>
+<span class="ty">List</span>&lt;<span class="cls">Animal</span>&gt; animals = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="cls">Animal</span>&gt;{
+    <span class="kw">new</span> <span class="cls">Dog</span>(<span class="st">'Bruno'</span>, <span class="nm">3</span>, <span class="st">'Lab'</span>),
+    <span class="kw">new</span> <span class="cls">Cat</span>(<span class="st">'Mimi'</span>, <span class="nm">2</span>),
+    <span class="kw">new</span> <span class="cls">Dog</span>(<span class="st">'Max'</span>, <span class="nm">5</span>, <span class="st">'Pug'</span>)
+};
+
+<span class="kw">for</span> (<span class="cls">Animal</span> animal : animals) {
+    <span class="cm">// instanceof = "is this object actually a Dog?"</span>
+    <span class="kw">if</span> (animal <span class="kw">instanceof</span> <span class="cls">Dog</span>) {
+        <span class="cls">Dog</span> dog = (<span class="cls">Dog</span>) animal;   <span class="cm">// Safe to cast — we just checked!</span>
+        System.<span class="fn">debug</span>(dog.name + <span class="st">' is a dog → '</span>);
+        dog.<span class="fn">fetch</span>();
+    } <span class="kw">else if</span> (animal <span class="kw">instanceof</span> <span class="cls">Cat</span>) {
+        System.<span class="fn">debug</span>(animal.name + <span class="st">' is a cat → meow!'</span>);
+    }
+}
+
+<span class="cm">// Primitive type casting</span>
+<span class="ty">Double</span>  pi      = <span class="nm">3.14159</span>;
+<span class="ty">Integer</span> piInt   = (<span class="ty">Integer</span>) pi;    <span class="cm">// Truncates decimal: 3</span>
+System.<span class="fn">debug</span>(<span class="st">'π as Integer: '</span> + piInt);   <span class="cm">// 3</span>
+
+<span class="ty">Integer</span> num  = <span class="nm">42</span>;
+<span class="ty">String</span>  str  = <span class="ty">String</span>.<span class="fn">valueOf</span>(num);   <span class="cm">// Integer → String</span>
+<span class="ty">Integer</span> back = <span class="ty">Integer</span>.<span class="fn">valueOf</span>(str);   <span class="cm">// String → Integer</span>
+System.<span class="fn">debug</span>(str + <span class="st">' → '</span> + back);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Bruno says: Woof! 🐶
+Bruno the Labrador fetches the ball! 🎾
+Bruno is a dog →
+Bruno the Lab fetches the ball! 🎾
+Mimi is a cat → meow!
+Max is a dog →
+Max the Pug fetches the ball! 🎾
+π as Integer: 3
+42 → 42</pre>
+  </div>
+
+  <!-- ── ABSTRACTION ── -->
+  <h3>🎯 7. Abstraction — "Show the What, Hide the How"</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    You use a <strong>washing machine</strong>: you press "Cotton Wash" and walk away. You don't care about water temperature algorithms or drum rotation speed. <strong>Abstraction</strong> = showing the user only what they need to interact with, hiding the complex internals.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">AbstractionDemo.apex</span></div>
+<pre><span class="cm">// The abstract class defines WHAT needs to happen
+// Each child decides HOW it happens</span>
+<span class="kw">public abstract class</span> <span class="cls">PaymentGateway</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span>  gatewayName;
+    <span class="kw">public</span> <span class="ty">Boolean</span> sandboxMode;
+
+    <span class="cm">// ABSTRACT methods — WHAT to do (no body)
+    // Every payment gateway MUST implement these differently</span>
+    <span class="kw">public abstract</span> <span class="ty">Boolean</span> <span class="fn">processPayment</span>(<span class="ty">Decimal</span> amount);
+    <span class="kw">public abstract</span> <span class="ty">String</span>  <span class="fn">getTransactionId</span>();
+
+    <span class="cm">// CONCRETE method — shared HOW (already implemented)
+    // Works the same for ALL gateways</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">initiatePayment</span>(<span class="ty">Decimal</span> amount) {
+        System.<span class="fn">debug</span>(<span class="st">'=== '</span> + gatewayName + <span class="st">' Payment ===   '</span>);
+        System.<span class="fn">debug</span>(<span class="st">'Mode: '</span> + (sandboxMode ? <span class="st">'TEST'</span> : <span class="st">'LIVE'</span>));
+        <span class="ty">Boolean</span> success = <span class="fn">processPayment</span>(amount);  <span class="cm">// calls child's version!</span>
+        <span class="kw">if</span> (success) {
+            System.<span class="fn">debug</span>(<span class="st">'✅ Payment success! TxnID: '</span> + <span class="fn">getTransactionId</span>());
+        } <span class="kw">else</span> {
+            System.<span class="fn">debug</span>(<span class="st">'❌ Payment failed!'</span>);
+        }
+    }
+}
+
+<span class="cm">// Razorpay implementation</span>
+<span class="kw">public class</span> <span class="cls">RazorpayGateway</span> <span class="kw">extends</span> <span class="cls">PaymentGateway</span> {
+    <span class="kw">public</span> <span class="cls">RazorpayGateway</span>() {
+        gatewayName = <span class="st">'Razorpay'</span>;
+        sandboxMode = <span class="kw">true</span>;
+    }
+    <span class="kw">public override</span> <span class="ty">Boolean</span> <span class="fn">processPayment</span>(<span class="ty">Decimal</span> amount) {
+        System.<span class="fn">debug</span>(<span class="st">'Razorpay: Charging ₹'</span> + amount + <span class="st">' via UPI/Card/Net Banking'</span>);
+        <span class="kw">return true</span>;    <span class="cm">// simulating success</span>
+    }
+    <span class="kw">public override</span> <span class="ty">String</span> <span class="fn">getTransactionId</span>() {
+        <span class="kw">return</span> <span class="st">'RZP_'</span> + <span class="ty">Math</span>.<span class="fn">random</span>().<span class="fn">toString</span>().<span class="fn">left</span>(<span class="nm">8</span>);
+    }
+}
+
+<span class="cm">// PayPal implementation — same interface, totally different internals</span>
+<span class="kw">public class</span> <span class="cls">PayPalGateway</span> <span class="kw">extends</span> <span class="cls">PaymentGateway</span> {
+    <span class="kw">public</span> <span class="cls">PayPalGateway</span>() {
+        gatewayName = <span class="st">'PayPal'</span>;
+        sandboxMode = <span class="kw">false</span>;
+    }
+    <span class="kw">public override</span> <span class="ty">Boolean</span> <span class="fn">processPayment</span>(<span class="ty">Decimal</span> amount) {
+        System.<span class="fn">debug</span>(<span class="st">'PayPal: Processing $'</span> + (amount/83) + <span class="st">' via PayPal account'</span>);
+        <span class="kw">return true</span>;
+    }
+    <span class="kw">public override</span> <span class="ty">String</span> <span class="fn">getTransactionId</span>() {
+        <span class="kw">return</span> <span class="st">'PAYPAL_'</span> + <span class="ty">DateTime</span>.<span class="fn">now</span>().<span class="fn">getTime</span>();
+    }
+}
+
+<span class="cm">// Usage: the caller doesn't care WHICH gateway — just calls initiatePayment()</span>
+<span class="cls">PaymentGateway</span> gw1 = <span class="kw">new</span> <span class="cls">RazorpayGateway</span>();
+gw1.<span class="fn">initiatePayment</span>(<span class="nm">1499</span>);
+
+<span class="cls">PaymentGateway</span> gw2 = <span class="kw">new</span> <span class="cls">PayPalGateway</span>();
+gw2.<span class="fn">initiatePayment</span>(<span class="nm">2999</span>);</pre>
+  </div>
+
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>=== Razorpay Payment ===
+Mode: TEST
+Razorpay: Charging ₹1499 via UPI/Card/Net Banking
+✅ Payment success! TxnID: RZP_0.743821
+
+=== PayPal Payment ===
+Mode: LIVE
+PayPal: Processing $18.06 via PayPal account
+✅ Payment success! TxnID: PAYPAL_1714132800000</pre>
+  </div>
+
+  <!-- ── OOP SUMMARY ── -->
+  <h3>📖 The 4 Pillars of OOP — Summarised</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Pillar</th><th>Simple Definition</th><th>Apex Keyword</th><th>Analogy</th></tr>
+    <tr><td><strong>Encapsulation</strong></td><td>Hide data, expose methods</td><td><code>private</code>, <code>public</code>, getters/setters</td><td>Bank vault with a service window</td></tr>
+    <tr><td><strong>Inheritance</strong></td><td>Child reuses parent's code</td><td><code>extends</code></td><td>Car inherits Vehicle's engine</td></tr>
+    <tr><td><strong>Polymorphism</strong></td><td>Same call, different behaviour</td><td><code>override</code>, overloading</td><td>Same Play button on different apps</td></tr>
+    <tr><td><strong>Abstraction</strong></td><td>Show the what, hide the how</td><td><code>abstract</code>, <code>interface</code></td><td>Washing machine buttons</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ════════════ SETUP GUIDE ════════════ -->
+<section class="section" id="setup">
+  <div class="section-label">// Complete Developer Setup</div>
+  <h2>⚙️ How to Set Up Your Salesforce Dev Environment from Zero</h2>
+  <p>You've got a Salesforce Developer org. Now let's turn your laptop into a proper Salesforce coding station — with VS Code, the right extensions, and a workflow that professional devs actually use.</p>
+
+  <div class="note"><strong>🗺️ The Big Picture:</strong> You'll write Apex code in VS Code on your laptop → push it to your Salesforce org in the cloud → test it there. Think of your org as a remote server and VS Code as your local editor with a deployment button.</div>
+
+  <!-- STEP 1 -->
+  <h3>📦 Step 1 — What You Need to Install</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Tool</th><th>What it is</th><th>Download</th></tr>
+    <tr><td><strong>VS Code</strong></td><td>The code editor you'll write in</td><td><code>code.visualstudio.com</code></td></tr>
+    <tr><td><strong>Salesforce CLI (sf)</strong></td><td>Command-line tool to talk to your org</td><td><code>developer.salesforce.com/tools/salesforcecli</code></td></tr>
+    <tr><td><strong>Java JDK 11+</strong></td><td>Required by some SF tools</td><td><code>adoptium.net</code> (Eclipse Temurin)</td></tr>
+    <tr><td><strong>Git</strong></td><td>Version control (save your code history)</td><td><code>git-scm.com</code></td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Verify Installations</span></div>
+<pre><span class="cm"># After installing, verify everything works — open a terminal and run:</span>
+
+sf --version           <span class="cm"># Should show: @salesforce/cli/x.x.x</span>
+java --version         <span class="cm"># Should show: openjdk 11.x.x or higher</span>
+git --version          <span class="cm"># Should show: git version 2.x.x</span>
+code --version         <span class="cm"># Should show: VS Code version number</span></pre>
+  </div>
+
+  <!-- STEP 2 -->
+  <h3>🧩 Step 2 — VS Code Extensions to Install</h3>
+  <p>Open VS Code → press <code>Ctrl+Shift+X</code> (Windows/Linux) or <code>Cmd+Shift+X</code> (Mac) to open Extensions panel. Search for and install each:</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Extension Name</th><th>Publisher</th><th>Why You Need It</th></tr>
+    <tr><td><strong>Salesforce Extension Pack</strong></td><td>Salesforce</td><td>The master pack — includes all core SF tools. Install this FIRST.</td></tr>
+    <tr><td><strong>Apex PMD</strong></td><td>Chuckjonas</td><td>Highlights code quality issues and potential governor limit violations while you type</td></tr>
+    <tr><td><strong>Salesforce Documenter</strong></td><td>HugoOM</td><td>Auto-generates JSDoc/ApexDoc comments for your classes and methods</td></tr>
+    <tr><td><strong>Prettier</strong></td><td>Prettier</td><td>Auto-formats your code on save — keeps everything neat</td></tr>
+    <tr><td><strong>GitLens</strong></td><td>GitKraken</td><td>See git history, who changed what line, when — right inside VS Code</td></tr>
+    <tr><td><strong>Error Lens</strong></td><td>usernamehw</td><td>Shows error messages inline next to the problem line (saves constant scrolling)</td></tr>
+    <tr><td><strong>SFDX Hardis</strong></td><td>Nicolas Vuillamy</td><td>Helpful GUI for common SF operations</td></tr>
+  </table>
+  </div>
+
+  <div class="note"><strong>💡 The Salesforce Extension Pack installs these sub-extensions automatically:</strong> Apex language support, Apex Debugger, Apex Replay Debugger, Salesforce CLI Integration, SOQL Builder, Lightning Web Components support, and more.</div>
+
+  <!-- STEP 3 -->
+  <h3>🔗 Step 3 — Connect VS Code to Your Developer Org</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Authorise Your Org</span></div>
+<pre><span class="cm"># This opens a browser login page for your Salesforce org.
+# Use your Developer org credentials (the account you created).</span>
+sf org login web --set-default --alias myDevOrg
+
+<span class="cm"># After logging in via browser, you'll see:
+# "Successfully authorized yourname@example.com with org ID 00D..."
+
+# Verify it worked — list your authorised orgs:</span>
+sf org list
+
+<span class="cm"># Set it as the default org for all commands:</span>
+sf config set target-org myDevOrg</pre>
+  </div>
+
+  <!-- STEP 4 -->
+  <h3>📁 Step 4 — Create Your First SFDX Project</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Create Project</span></div>
+<pre><span class="cm"># Navigate to where you want the project folder</span>
+cd ~/Documents   <span class="cm"># or wherever you keep projects</span>
+
+<span class="cm"># Create a new Salesforce project (this creates the folder structure)</span>
+sf project generate --name MyApexProject
+
+<span class="cm"># Go into the project folder</span>
+cd MyApexProject
+
+<span class="cm"># Open the project in VS Code</span>
+code .</pre>
+  </div>
+
+  <!-- STEP 5 — FILE STRUCTURE -->
+  <h3>🗂️ Step 5 — Understanding the Project File Structure</h3>
+  <p>When you open the project in VS Code, you'll see this folder structure. Every folder has a specific purpose — do NOT move files around randomly!</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Project Structure</span></div>
+<pre>MyApexProject/
+│
+├── 📄 sfdx-project.json       <span class="cm">← Project config: org info, API version, etc.</span>
+├── 📄 .forceignore             <span class="cm">← Like .gitignore — files NOT to deploy</span>
+├── 📄 .gitignore               <span class="cm">← Files not to track in git</span>
+│
+├── 📁 .sf/                    <span class="cm">← SF CLI internal settings (don't touch)</span>
+│
+└── 📁 force-app/
+    └── 📁 main/
+        └── 📁 default/        <span class="cm">← ALL your metadata goes here</span>            
+            │
+            ├── 📁 classes/    <span class="cm">← Your Apex CLASS files live here</span>
+            │   ├── MyClass.cls              <span class="cm">← The actual Apex code</span>
+            │   └── MyClass.cls-meta.xml     <span class="cm">← Metadata descriptor (required!)</span>
+            │
+            ├── 📁 triggers/   <span class="cm">← Apex TRIGGER files</span>
+            │   ├── AccountTrigger.trigger
+            │   └── AccountTrigger.trigger-meta.xml
+            │
+            ├── 📁 lwc/        <span class="cm">← Lightning Web Components (UI)</span>
+            ├── 📁 aura/        <span class="cm">← Aura Components (older UI framework)</span>
+            ├── 📁 objects/     <span class="cm">← Custom objects, fields, validation rules</span>
+            ├── 📁 layouts/     <span class="cm">← Page layouts</span>
+            ├── 📁 permissionsets/ <span class="cm">← Permission sets</span>
+            └── 📁 staticresources/ <span class="cm">← JS libraries, CSS, images</span></pre>
+  </div>
+
+  <!-- STEP 6 — WRITING CODE -->
+  <h3>✍️ Step 6 — Writing Your First Apex Class in VS Code</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Create a new Apex Class</span></div>
+<pre><span class="cm"># Method 1: Use SF CLI to generate the class file + metadata file together</span>
+sf apex generate class --name HelloSalesforce --output-dir force-app/main/default/classes
+
+<span class="cm"># This creates TWO files automatically:
+# → force-app/main/default/classes/HelloSalesforce.cls
+# → force-app/main/default/classes/HelloSalesforce.cls-meta.xml</span>
+
+<span class="cm"># Method 2 (VS Code GUI): 
+# Press Ctrl+Shift+P → type "SFDX: Create Apex Class" → follow prompts</span></pre>
+  </div>
+
+  <p>The generated <code>.cls</code> file will look like this — now add your code:</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">HelloSalesforce.cls</span></div>
+<pre><span class="cm">// Every Apex class file starts with the access modifier and class declaration</span>
+<span class="kw">public with sharing class</span> <span class="cls">HelloSalesforce</span> {
+
+    <span class="cm">// A simple static method we can run from Anonymous Apex</span>
+    <span class="kw">public static</span> <span class="ty">void</span> <span class="fn">greet</span>(<span class="ty">String</span> name) {
+        System.<span class="fn">debug</span>(<span class="st">'👋 Hello, '</span> + name + <span class="st">'! Welcome to Salesforce Apex!'</span>);
+    }
+
+    <span class="kw">public static</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; <span class="fn">getTopAccounts</span>(<span class="ty">Integer</span> howMany) {
+        <span class="kw">return</span> [<span class="kw">SELECT</span> Id, Name, Phone <span class="kw">FROM</span> <span class="ty">Account</span>
+                <span class="kw">ORDER BY</span> Name <span class="kw">LIMIT</span> :howMany];
+    }
+}</pre>
+  </div>
+
+  <p>The <code>.cls-meta.xml</code> file looks like this — you rarely edit it manually:</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">HelloSalesforce.cls-meta.xml</span></div>
+<pre>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;ApexClass xmlns="http://soap.sforce.com/2006/04/metadata"&gt;
+    <span class="cm">&lt;!-- API version — keep this at latest (58.0, 59.0, etc.) --&gt;</span>
+    &lt;apiVersion&gt;59.0&lt;/apiVersion&gt;
+    <span class="cm">&lt;!-- Active = this class is deployed and usable --&gt;</span>
+    &lt;status&gt;Active&lt;/status&gt;
+&lt;/ApexClass&gt;</pre>
+  </div>
+
+  <!-- STEP 7 — DEPLOY -->
+  <h3>🚀 Step 7 — Deploying Code to Your Org</h3>
+  <p>Writing code locally doesn't change your org. You must <strong>push/deploy</strong> to send it to Salesforce's servers.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Deploy Options</span></div>
+<pre><span class="cm"># ─────────────────────────────────────────────
+# METHOD 1: Push ONE specific file (fastest for quick iterations)
+# Right-click the .cls file in VS Code → "SFDX: Deploy Source to Org"
+# OR use terminal:
+# ─────────────────────────────────────────────</span>
+sf project deploy start --source-file force-app/main/default/classes/HelloSalesforce.cls
+
+<span class="cm"># ─────────────────────────────────────────────
+# METHOD 2: Deploy the ENTIRE project (use when deploying many files)
+# ─────────────────────────────────────────────</span>
+sf project deploy start --source-dir force-app
+
+<span class="cm"># ─────────────────────────────────────────────
+# METHOD 3: PULL changes FROM org to local
+# (when you make changes in org's Setup UI and want them locally)
+# ─────────────────────────────────────────────</span>
+sf project retrieve start --source-dir force-app
+
+<span class="cm"># After deploying, you'll see:
+# Deploying metadata to [org]...
+# Deployed 1 source file to [org].  ✅
+# Or error details if something is wrong.</span></pre>
+  </div>
+
+  <!-- STEP 8 — ANONYMOUS APEX -->
+  <h3>▶️ Step 8 — Running Code with Anonymous Apex (Testing Quickly)</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Anonymous Apex is like a Salesforce <strong>scratchpad</strong>. You type some code, run it, see the output — without creating a permanent class. Perfect for testing, debugging, and running one-off operations.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">VS Code — Anonymous Apex Steps</span></div>
+<pre><span class="cm">// Step 1: Press Ctrl+Shift+P → type "SFDX: Execute Anonymous Apex"
+// OR: Create a file with .apex extension and right-click → Execute
+
+// Step 2: Write your test code directly — no class wrapper needed!</span>
+
+<span class="cm">// Call your deployed class method:</span>
+<span class="cls">HelloSalesforce</span>.<span class="fn">greet</span>(<span class="st">'World'</span>);
+
+<span class="cm">// Insert a test record:</span>
+<span class="ty">Account</span> a = <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Test Corp'</span>, Phone = <span class="st">'1234567890'</span>);
+<span class="kw">insert</span> a;
+System.<span class="fn">debug</span>(<span class="st">'Created: '</span> + a.Id);
+
+<span class="cm">// Query records:</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accs = [<span class="kw">SELECT</span> Name <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">LIMIT</span> <span class="nm">5</span>];
+<span class="kw">for</span>(<span class="ty">Account</span> acc : accs) {
+    System.<span class="fn">debug</span>(acc.Name);
+}
+
+<span class="cm">// Step 3: Check OUTPUT in the bottom panel → "Output" tab → "Apex Debug Logs"
+// Look for lines starting with USER_DEBUG — those are your System.debug() calls</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Run Anonymous Apex via CLI</span></div>
+<pre><span class="cm"># Create a file called test.apex with your code, then run:</span>
+sf apex run --file test.apex
+
+<span class="cm"># Output shows in terminal. Look for USER_DEBUG lines:
+# [1] | USER_DEBUG | [1] | DEBUG | 👋 Hello, World! Welcome to Salesforce Apex!</span></pre>
+  </div>
+
+  <!-- STEP 9 — DEBUG LOGS -->
+  <h3>🔍 Step 9 — Reading Debug Logs (Your Magnifying Glass)</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Reading a Debug Log</span></div>
+<pre><span class="cm"># A debug log looks like this — here's how to read it:
+
+09:15:32.045 (45000000)|USER_DEBUG|[3]|DEBUG|👋 Hello, World!
+     ↑              ↑       ↑         ↑    ↑        ↑
+  Timestamp    Nanoseconds  Event    Line  Log   Your output
+                                    Num  Level  from System.debug()
+
+# Other important events in a log:
+09:15:32.001|SOQL_EXECUTE_BEGIN|[5]|Aggregations:0|SELECT Id FROM Account
+09:15:32.010|SOQL_EXECUTE_END|[5]|Rows:3          ← returned 3 rows
+09:15:32.020|DML_BEGIN|[8]|Op:Insert|Type:Account|Rows:1
+09:15:32.040|DML_END|[8]                           ← DML finished
+09:15:32.050|FATAL_ERROR|System.LimitException:    ← limit hit!
+
+# In VS Code: View → Command Palette → "SFDX: Get Apex Debug Logs"
+# Then click any log file → it opens with colour-coded events</span></pre>
+  </div>
+
+  <!-- STEP 10 — DEVELOPER CONSOLE -->
+  <h3>🌐 Step 10 — Using the Developer Console (Browser-Based)</h3>
+  <p>You can also write and run Apex directly <em>inside Salesforce</em> using the Developer Console — no local setup needed. Great for quick experiments when you're on a different computer.</p>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">How to Open Developer Console</span></div>
+<pre><span class="cm"># In your Salesforce org (browser):
+# 1. Click your Profile icon (top right)
+# 2. Click "Developer Console"
+# 3. A new window opens — this is your browser IDE
+
+# KEY TABS IN DEVELOPER CONSOLE:
+# ──────────────────────────────────────────────────────
+# File → New → Apex Class        Create a new class
+# Debug → Open Execute Anonymous  Anonymous Apex scratchpad
+# Query Editor (bottom)           Run SOQL queries interactively
+# Logs tab                        See all debug logs
+# Test tab                        Run Apex test classes
+# ──────────────────────────────────────────────────────
+
+# To run Anonymous Apex:
+# Debug menu → Open Execute Anonymous Window (Ctrl+E)
+# Type your code → Click "Execute" button
+# Bottom panel shows the log output → check "Open Log" checkbox</span></pre>
+  </div>
+
+  <!-- STEP 11 — KEY COMMANDS -->
+  <h3>⌨️ Step 11 — Essential Commands &amp; Shortcuts Cheat Sheet</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Action</th><th>VS Code Shortcut / Command</th></tr>
+    <tr><td>Command Palette (all commands)</td><td><code>Ctrl+Shift+P</code> / <code>Cmd+Shift+P</code></td></tr>
+    <tr><td>Deploy current file to org</td><td>Right-click → "SFDX: Deploy Source to Org"</td></tr>
+    <tr><td>Retrieve from org</td><td>Right-click → "SFDX: Retrieve Source from Org"</td></tr>
+    <tr><td>Run Anonymous Apex</td><td><code>Ctrl+Shift+P</code> → "SFDX: Execute Anonymous Apex"</td></tr>
+    <tr><td>Create Apex Class</td><td><code>Ctrl+Shift+P</code> → "SFDX: Create Apex Class"</td></tr>
+    <tr><td>Create Apex Trigger</td><td><code>Ctrl+Shift+P</code> → "SFDX: Create Apex Trigger"</td></tr>
+    <tr><td>View debug logs</td><td><code>Ctrl+Shift+P</code> → "SFDX: Get Apex Debug Logs"</td></tr>
+    <tr><td>Run Apex tests</td><td><code>Ctrl+Shift+P</code> → "SFDX: Run Apex Tests"</td></tr>
+    <tr><td>SOQL Builder (visual query)</td><td><code>Ctrl+Shift+P</code> → "SFDX: Open SOQL Builder"</td></tr>
+    <tr><td>Org Browser (see all objects)</td><td>Click the SF cloud icon in left sidebar</td></tr>
+    <tr><td>Check org login status</td><td><code>sf org display</code> in terminal</td></tr>
+    <tr><td>Open org in browser</td><td><code>sf org open</code> in terminal</td></tr>
+  </table>
+  </div>
+
+  <!-- STEP 12 — WORKFLOW -->
+  <h3>🔄 Step 12 — The Day-to-Day Dev Workflow</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">The Professional Apex Dev Loop</span></div>
+<pre><span class="cm">┌─────────────────────────────────────────────────────────────────────┐
+│                    THE SALESFORCE DEV WORKFLOW                       │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                       │
+│  1. PLAN                                                              │
+│     Understand what you need to build                                 │
+│     Identify the objects, fields, and logic involved                  │
+│                                                                       │
+│  2. WRITE  (VS Code → .cls file)                                      │
+│     Write your Apex class or trigger                                  │
+│     Use System.debug() liberally to trace your logic                  │
+│                                                                       │
+│  3. DEPLOY  (Ctrl+Shift+P → Deploy Source to Org)                    │
+│     Push code from local machine to your Dev Org                      │
+│     Check for compile errors in the Output panel                      │
+│                                                                       │
+│  4. TEST  (Anonymous Apex → Execute)                                  │
+│     Run your code with test data                                       │
+│     Check debug logs for System.debug() output                        │
+│                                                                       │
+│  5. DEBUG  (Logs panel → find USER_DEBUG lines)                       │
+│     If something is wrong, add more System.debug() calls              │
+│     Re-deploy → re-run → read logs                                    │
+│                                                                       │
+│  6. WRITE TESTS  (Apex Test Class — required for production!)         │
+│     Salesforce requires 75% code coverage before deployment to prod   │
+│     Create a class ending in "Test" (e.g., HelloSalesforceTest)       │
+│                                                                       │
+│  7. COMMIT  (git add → git commit → git push)                        │
+│     Save your progress with a meaningful commit message               │
+│                                                                       │
+│  Repeat steps 2–7 for every feature                                   │
+└─────────────────────────────────────────────────────────────────────┘</span></pre>
+  </div>
+
+  <!-- STEP 13 — TEST CLASS -->
+  <h3>✅ Step 13 — Writing Your First Test Class (Required!)</h3>
+  <div class="warning"><strong>⚠️ Salesforce Rule:</strong> You cannot deploy Apex to a production org without <strong>at least 75% code coverage</strong> from unit tests. Every serious Apex class needs a corresponding test class. Build this habit from day one!</div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">HelloSalesforceTest.cls</span></div>
+<pre><span class="cm">// Test classes MUST have @isTest annotation
+// They do NOT count toward governor limits!
+// They run in an isolated transaction with a fresh database</span>
+@<span class="cls">isTest</span>
+<span class="kw">public class</span> <span class="cls">HelloSalesforceTest</span> {
+
+    <span class="cm">// @TestSetup runs once before ALL test methods — for shared setup data</span>
+    @<span class="cls">TestSetup</span>
+    <span class="kw">static void</span> <span class="fn">setupData</span>() {
+        <span class="cm">// Create test accounts that ALL test methods can use</span>
+        <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; testAccs = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt;{
+            <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Test Company A'</span>),
+            <span class="kw">new</span> <span class="ty">Account</span>(Name = <span class="st">'Test Company B'</span>)
+        };
+        <span class="kw">insert</span> testAccs;
+    }
+
+    <span class="cm">// Each test method must have @isTest annotation
+    // Name it descriptively: test_whatYoureTestingAnd_expectedResult</span>
+    @<span class="cls">isTest</span>
+    <span class="kw">static void</span> <span class="fn">test_greet_shouldPrintMessage</span>() {
+        <span class="cm">// Test.startTest() / stopTest() marks the boundaries of your test
+        // Any limits used BEFORE startTest don't count toward your class's limits</span>
+        Test.<span class="fn">startTest</span>();
+            <span class="cls">HelloSalesforce</span>.<span class="fn">greet</span>(<span class="st">'TestUser'</span>);   <span class="cm">// Call your method</span>
+        Test.<span class="fn">stopTest</span>();
+
+        <span class="cm">// System.assert() — verify the expected result
+        // If the assertion fails, the test FAILS and shows an error</span>
+        System.<span class="fn">assert</span>(<span class="kw">true</span>, <span class="st">'greet() ran without error'</span>);
+    }
+
+    @<span class="cls">isTest</span>
+    <span class="kw">static void</span> <span class="fn">test_getTopAccounts_shouldReturnCorrectCount</span>() {
+        Test.<span class="fn">startTest</span>();
+            <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; result = <span class="cls">HelloSalesforce</span>.<span class="fn">getTopAccounts</span>(<span class="nm">2</span>);
+        Test.<span class="fn">stopTest</span>();
+
+        <span class="cm">// Assert the result is not null</span>
+        System.<span class="fn">assertNotEquals</span>(<span class="kw">null</span>, result, <span class="st">'Result should not be null'</span>);
+
+        <span class="cm">// Assert we got exactly 2 accounts back (we created 2 in setup)</span>
+        System.<span class="fn">assertEquals</span>(<span class="nm">2</span>, result.<span class="fn">size</span>(), <span class="st">'Should return 2 accounts'</span>);
+    }
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">Terminal — Run Your Tests</span></div>
+<pre><span class="cm"># Run ALL tests in your org:</span>
+sf apex run test --target-org myDevOrg
+
+<span class="cm"># Run a SPECIFIC test class:</span>
+sf apex run test --class-names HelloSalesforceTest --target-org myDevOrg
+
+<span class="cm"># Run with code coverage report:</span>
+sf apex run test --class-names HelloSalesforceTest --code-coverage --result-format human
+
+<span class="cm"># Output shows:
+# === Test Summary
+# Outcome              Passed
+# Tests Ran            2
+# Pass Rate            100%
+# Code Coverage        100%    ← 75%+ needed for production deploy!</span></pre>
+  </div>
+
+  <!-- QUICK REFERENCE -->
+  <h3>📋 Complete Developer Setup Checklist</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>✅</th><th>Task</th><th>Done When…</th></tr>
+    <tr><td>☐</td><td>Install VS Code</td><td><code>code --version</code> prints a version</td></tr>
+    <tr><td>☐</td><td>Install Salesforce CLI</td><td><code>sf --version</code> prints a version</td></tr>
+    <tr><td>☐</td><td>Install Java JDK 11+</td><td><code>java --version</code> shows 11+</td></tr>
+    <tr><td>☐</td><td>Install Salesforce Extension Pack</td><td>See cloud icon in VS Code sidebar</td></tr>
+    <tr><td>☐</td><td>Authorise Developer Org</td><td><code>sf org list</code> shows your org</td></tr>
+    <tr><td>☐</td><td>Create SFDX project</td><td><code>force-app/</code> folder exists</td></tr>
+    <tr><td>☐</td><td>Create first Apex class</td><td><code>.cls</code> and <code>.cls-meta.xml</code> both created</td></tr>
+    <tr><td>☐</td><td>Deploy to org</td><td>"Deployed 1 source file" success message</td></tr>
+    <tr><td>☐</td><td>Run Anonymous Apex</td><td>See your debug output in logs</td></tr>
+    <tr><td>☐</td><td>Write a test class</td><td>Tests pass with 75%+ coverage</td></tr>
+  </table>
+  </div>
+
+  <div class="analogy">
+    <div class="analogy-label">🎯 You're now ready — here's your first mission</div>
+    Open your Developer Org → Open VS Code → Create a class called <code>LearnApex</code> → Write a method that queries 5 Accounts and prints each name → Deploy it → Run it via Anonymous Apex → Read the debug log output. That single loop of write → deploy → test → debug is the entire job of a Salesforce developer, just at different complexity levels.
+  </div>
+</section>
+
+<!-- ════════════ INNER CLASSES ════════════ -->
+<section class="section" id="inner-classes">
+  <div class="section-label">// OOP Deep Dive · Part 2</div>
+  <h2>📦 Inner Classes, Nested Classes &amp; Enums</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A car has an engine inside it. The engine isn't a separate entity on the street — it only makes sense <em>inside a car</em>. <strong>Inner classes</strong> are the same: a class defined <em>inside another class</em> because it only makes sense in that context. You use them to logically group helper structures together.
+  </div>
+
+  <h3>🔷 Inner Classes</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">InnerClassDemo.apex</span></div>
+<pre><span class="cm">// Outer class — the "wrapper"</span>
+<span class="kw">public class</span> <span class="cls">ShoppingCart</span> {
+
+    <span class="kw">public</span> <span class="ty">String</span> customerName;
+    <span class="kw">private</span> <span class="ty">List</span>&lt;<span class="cls">CartItem</span>&gt; items = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="cls">CartItem</span>&gt;();
+
+    <span class="cm">// ─────────────────────────────────────────────
+    // INNER CLASS — only makes sense inside ShoppingCart
+    // Represents a single line item in the cart
+    // ─────────────────────────────────────────────</span>
+    <span class="kw">public class</span> <span class="cls">CartItem</span> {
+        <span class="kw">public</span> <span class="ty">String</span>  productName;
+        <span class="kw">public</span> <span class="ty">Integer</span> quantity;
+        <span class="kw">public</span> <span class="ty">Decimal</span> unitPrice;
+
+        <span class="kw">public</span> <span class="cls">CartItem</span>(<span class="ty">String</span> name, <span class="ty">Integer</span> qty, <span class="ty">Decimal</span> price) {
+            <span class="kw">this</span>.productName = name;
+            <span class="kw">this</span>.quantity    = qty;
+            <span class="kw">this</span>.unitPrice   = price;
+        }
+
+        <span class="cm">// Method on the inner class</span>
+        <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">lineTotal</span>() {
+            <span class="kw">return</span> quantity * unitPrice;
+        }
+    }
+
+    <span class="cm">// Outer class constructor</span>
+    <span class="kw">public</span> <span class="cls">ShoppingCart</span>(<span class="ty">String</span> name) {
+        <span class="kw">this</span>.customerName = name;
+    }
+
+    <span class="cm">// Add item to cart</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">addItem</span>(<span class="ty">String</span> product, <span class="ty">Integer</span> qty, <span class="ty">Decimal</span> price) {
+        items.<span class="fn">add</span>(<span class="kw">new</span> <span class="cls">CartItem</span>(product, qty, price));   <span class="cm">// Using inner class</span>
+    }
+
+    <span class="cm">// Calculate total</span>
+    <span class="kw">public</span> <span class="ty">Decimal</span> <span class="fn">getTotal</span>() {
+        <span class="ty">Decimal</span> total = <span class="nm">0</span>;
+        <span class="kw">for</span> (<span class="cls">CartItem</span> item : items) {
+            total += item.<span class="fn">lineTotal</span>();
+        }
+        <span class="kw">return</span> total;
+    }
+
+    <span class="cm">// Print receipt</span>
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">printReceipt</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'=== Receipt for: '</span> + customerName + <span class="st">' ==='</span>);
+        <span class="kw">for</span> (<span class="cls">CartItem</span> item : items) {
+            System.<span class="fn">debug</span>(item.productName + <span class="st">' x'</span> + item.quantity
+                       + <span class="st">'  →  ₹'</span> + item.<span class="fn">lineTotal</span>());
+        }
+        System.<span class="fn">debug</span>(<span class="st">'TOTAL: ₹'</span> + <span class="fn">getTotal</span>());
+    }
+}
+
+<span class="cm">// ─── How to USE an inner class from outside ───
+// You reference it as: OuterClass.InnerClass</span>
+<span class="cls">ShoppingCart</span> cart = <span class="kw">new</span> <span class="cls">ShoppingCart</span>(<span class="st">'Rahul'</span>);
+cart.<span class="fn">addItem</span>(<span class="st">'Laptop'</span>,   <span class="nm">1</span>, <span class="nm">55000</span>);
+cart.<span class="fn">addItem</span>(<span class="st">'Mouse'</span>,    <span class="nm">2</span>, <span class="nm">800</span>);
+cart.<span class="fn">addItem</span>(<span class="st">'Keyboard'</span>, <span class="nm">1</span>, <span class="nm">1500</span>);
+cart.<span class="fn">printReceipt</span>();
+
+<span class="cm">// You can also create CartItem from outside (it's public):</span>
+<span class="cls">ShoppingCart</span>.<span class="cls">CartItem</span> singleItem = <span class="kw">new</span> <span class="cls">ShoppingCart</span>.<span class="cls">CartItem</span>(<span class="st">'USB Hub'</span>, <span class="nm">3</span>, <span class="nm">600</span>);
+System.<span class="fn">debug</span>(<span class="st">'USB Hub line total: ₹'</span> + singleItem.<span class="fn">lineTotal</span>());</pre>
+  </div>
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>=== Receipt for: Rahul ===
+Laptop x1  →  ₹55000
+Mouse x2   →  ₹1600
+Keyboard x1 →  ₹1500
+TOTAL: ₹58100
+USB Hub line total: ₹1800</pre>
+  </div>
+
+  <h3>🔶 Enums — A Fixed List of Named Constants</h3>
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    Traffic lights can only be <strong>RED, YELLOW, or GREEN</strong> — nothing else. If someone passes the value "PURPLE" to your traffic light code, that's a bug. An <strong>enum</strong> locks in the allowed values at compile time. No typos, no invalid values.
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">EnumDemo.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// ENUM — define a fixed set of named values
+// Think of it as a type-safe list of allowed options
+// ─────────────────────────────────────────────</span>
+<span class="kw">public enum</span> <span class="cls">OrderStatus</span> {
+    PENDING,
+    PROCESSING,
+    SHIPPED,
+    DELIVERED,
+    CANCELLED
+}
+
+<span class="kw">public enum</span> <span class="cls">Priority</span> { LOW, MEDIUM, HIGH, CRITICAL }
+
+<span class="kw">public class</span> <span class="cls">Order</span> {
+    <span class="kw">public</span> <span class="ty">String</span>      orderId;
+    <span class="kw">public</span> <span class="cls">OrderStatus</span> status;
+    <span class="kw">public</span> <span class="cls">Priority</span>    priority;
+
+    <span class="kw">public</span> <span class="cls">Order</span>(<span class="ty">String</span> id) {
+        <span class="kw">this</span>.orderId  = id;
+        <span class="kw">this</span>.status   = <span class="cls">OrderStatus</span>.PENDING;    <span class="cm">// default</span>
+        <span class="kw">this</span>.priority = <span class="cls">Priority</span>.MEDIUM;
+    }
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">ship</span>() {
+        <span class="cm">// Switch on enum values — clean and readable!</span>
+        <span class="kw">if</span> (status == <span class="cls">OrderStatus</span>.PROCESSING) {
+            status = <span class="cls">OrderStatus</span>.SHIPPED;
+            System.<span class="fn">debug</span>(orderId + <span class="st">' has been shipped! 📦'</span>);
+        } <span class="kw">else</span> {
+            System.<span class="fn">debug</span>(<span class="st">'Cannot ship — current status: '</span> + status);
+        }
+    }
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">printStatus</span>() {
+        System.<span class="fn">debug</span>(<span class="st">'Order: '</span> + orderId
+                   + <span class="st">' | Status: '</span>   + status
+                   + <span class="st">' | Priority: '</span> + priority);
+    }
+}
+
+<span class="cm">// Testing enums</span>
+<span class="cls">Order</span> o = <span class="kw">new</span> <span class="cls">Order</span>(<span class="st">'ORD-001'</span>);
+o.<span class="fn">printStatus</span>();
+
+o.status = <span class="cls">OrderStatus</span>.PROCESSING;
+o.<span class="fn">ship</span>();                           <span class="cm">// ✅ Now it ships</span>
+
+o.status = <span class="cls">OrderStatus</span>.PENDING;
+o.<span class="fn">ship</span>();                           <span class="cm">// ❌ Can't ship — wrong status</span>
+
+<span class="cm">// Enum in switch statement (Apex uses if-else, not switch)</span>
+<span class="cls">Priority</span> p = <span class="cls">Priority</span>.CRITICAL;
+<span class="ty">String</span> response = <span class="st">''</span>;
+<span class="kw">if</span>      (p == <span class="cls">Priority</span>.LOW)      response = <span class="st">'Handle in 5 days'</span>;
+<span class="kw">else if</span> (p == <span class="cls">Priority</span>.MEDIUM)   response = <span class="st">'Handle in 2 days'</span>;
+<span class="kw">else if</span> (p == <span class="cls">Priority</span>.HIGH)     response = <span class="st">'Handle today'</span>;
+<span class="kw">else if</span> (p == <span class="cls">Priority</span>.CRITICAL) response = <span class="st">'Handle RIGHT NOW! 🚨'</span>;
+System.<span class="fn">debug</span>(<span class="st">'Response: '</span> + response);</pre>
+  </div>
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Order: ORD-001 | Status: PENDING | Priority: MEDIUM
+ORD-001 has been shipped! 📦
+Cannot ship — current status: PENDING
+Response: Handle RIGHT NOW! 🚨</pre>
+  </div>
+</section>
+
+<!-- ════════════ EXCEPTION HANDLING ════════════ -->
+<section class="section" id="exceptions">
+  <div class="section-label">// OOP Deep Dive · Part 3</div>
+  <h2>💥 Exception Handling — When Things Go Wrong</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    You're driving (your code is running). Suddenly a tyre punctures (an error occurs). You have two choices: <strong>ignore it and crash the car</strong> (unhandled exception — your whole transaction fails), or <strong>pull over safely and call roadside assistance</strong> (try-catch — handle the error gracefully and continue).
+  </div>
+
+  <h3>Exception Hierarchy — Know Your Enemy</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Exception Type</th><th>When It Happens</th></tr>
+    <tr><td><code>DmlException</code></td><td>DML fails — required field missing, duplicate rule, etc.</td></tr>
+    <tr><td><code>QueryException</code></td><td>SOQL returns 0 rows but you assigned to single object; or returns multiple rows</td></tr>
+    <tr><td><code>NullPointerException</code></td><td>You call a method on a <code>null</code> variable</td></tr>
+    <tr><td><code>LimitException</code></td><td>Governor limit exceeded (cannot be caught!)</td></tr>
+    <tr><td><code>MathException</code></td><td>Division by zero</td></tr>
+    <tr><td><code>StringException</code></td><td>Invalid string operation</td></tr>
+    <tr><td><code>TypeException</code></td><td>Invalid type cast</td></tr>
+    <tr><td><code>Exception</code></td><td>The parent of all — catches anything</td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">ExceptionHandling.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// BASIC TRY-CATCH-FINALLY
+// ─────────────────────────────────────────────</span>
+<span class="kw">try</span> {
+    <span class="cm">// Code that might fail goes here</span>
+    <span class="ty">Account</span> acc = [<span class="kw">SELECT</span> Id <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">WHERE</span> Name = <span class="st">'DOES_NOT_EXIST'</span>];
+    <span class="cm">// ↑ This throws QueryException — no rows found!</span>
+
+} <span class="kw">catch</span> (<span class="ty">QueryException</span> qe) {
+    <span class="cm">// Specific catch — only for query errors</span>
+    System.<span class="fn">debug</span>(<span class="st">'Query failed: '</span> + qe.<span class="fn">getMessage</span>());
+
+} <span class="kw">catch</span> (<span class="ty">DmlException</span> de) {
+    <span class="cm">// Specific catch — only for DML errors</span>
+    System.<span class="fn">debug</span>(<span class="st">'DML failed: '</span> + de.<span class="fn">getMessage</span>());
+
+} <span class="kw">catch</span> (<span class="ty">Exception</span> e) {
+    <span class="cm">// Generic catch — catches ANYTHING not caught above
+    // Always put this LAST — it's the widest net</span>
+    System.<span class="fn">debug</span>(<span class="st">'Unexpected error: '</span> + e.<span class="fn">getMessage</span>());
+    System.<span class="fn">debug</span>(<span class="st">'Error type: '</span>       + e.<span class="fn">getTypeName</span>());
+    System.<span class="fn">debug</span>(<span class="st">'Stack trace: '</span>      + e.<span class="fn">getStackTraceString</span>());
+
+} <span class="kw">finally</span> {
+    <span class="cm">// ALWAYS runs — whether exception happened or not
+    // Good for cleanup: close connections, log to a custom object, etc.</span>
+    System.<span class="fn">debug</span>(<span class="st">'=== Execution completed ==='</span>);
+}
+
+<span class="cm">// ─────────────────────────────────────────────
+// NULL POINTER — most common beginner mistake!
+// ALWAYS check for null before calling methods on an object
+// ─────────────────────────────────────────────</span>
+<span class="ty">Account</span> maybeNull = <span class="kw">null</span>;
+
+<span class="kw">try</span> {
+    System.<span class="fn">debug</span>(maybeNull.Name);  <span class="cm">// BOOM — NullPointerException!</span>
+} <span class="kw">catch</span> (<span class="ty">NullPointerException</span> npe) {
+    System.<span class="fn">debug</span>(<span class="st">'Got null pointer: '</span> + npe.<span class="fn">getMessage</span>());
+}
+
+<span class="cm">// ✅ ALWAYS do a null check first:</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; results = [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">LIMIT</span> <span class="nm">1</span>];
+<span class="kw">if</span> (!results.<span class="fn">isEmpty</span>()) {
+    <span class="ty">Account</span> safeAcc = results[<span class="nm">0</span>];
+    System.<span class="fn">debug</span>(<span class="st">'Found: '</span> + safeAcc.Name);  <span class="cm">// Safe!</span>
+}</pre>
+  </div>
+
+  <h3>🛠️ Custom Exceptions — Make Your Own Error Types</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">CustomException.apex</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// Create your OWN exception class — must extend Exception
+// Name convention: always end with "Exception"
+// ─────────────────────────────────────────────</span>
+<span class="kw">public class</span> <span class="cls">InsufficientStockException</span> <span class="kw">extends</span> <span class="ty">Exception</span> {}
+<span class="kw">public class</span> <span class="cls">InvalidAgeException</span>       <span class="kw">extends</span> <span class="ty">Exception</span> {}
+<span class="kw">public class</span> <span class="cls">PaymentDeclinedException</span>   <span class="kw">extends</span> <span class="ty">Exception</span> {}
+
+<span class="kw">public class</span> <span class="cls">Inventory</span> {
+    <span class="kw">private</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; stock = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt;{
+        <span class="st">'Laptop'</span>   => <span class="nm">5</span>,
+        <span class="st">'Phone'</span>    => <span class="nm">12</span>,
+        <span class="st">'Headphone'</span>=> <span class="nm">3</span>
+    };
+
+    <span class="kw">public</span> <span class="ty">void</span> <span class="fn">sell</span>(<span class="ty">String</span> item, <span class="ty">Integer</span> qty) {
+        <span class="kw">if</span> (!stock.<span class="fn">containsKey</span>(item)) {
+            <span class="cm">// Throw custom exception with a clear message</span>
+            <span class="kw">throw new</span> <span class="cls">InsufficientStockException</span>(
+                <span class="st">'Product not found: '</span> + item);
+        }
+        <span class="kw">if</span> (stock.<span class="fn">get</span>(item) < qty) {
+            <span class="kw">throw new</span> <span class="cls">InsufficientStockException</span>(
+                <span class="st">'Only '</span> + stock.<span class="fn">get</span>(item)
+                + <span class="st">' of "'</span> + item + <span class="st">'" in stock. Requested: '</span> + qty);
+        }
+        stock.<span class="fn">put</span>(item, stock.<span class="fn">get</span>(item) - qty);
+        System.<span class="fn">debug</span>(<span class="st">'Sold '</span> + qty + <span class="st">'x '</span> + item
+                   + <span class="st">'  →  Remaining: '</span> + stock.<span class="fn">get</span>(item));
+    }
+}
+
+<span class="cm">// Using the custom exception</span>
+<span class="cls">Inventory</span> inv = <span class="kw">new</span> <span class="cls">Inventory</span>();
+
+<span class="kw">try</span> {
+    inv.<span class="fn">sell</span>(<span class="st">'Laptop'</span>, <span class="nm">3</span>);          <span class="cm">// ✅ OK — 5 in stock</span>
+    inv.<span class="fn">sell</span>(<span class="st">'Headphone'</span>, <span class="nm">5</span>);       <span class="cm">// ❌ Only 3 in stock!</span>
+} <span class="kw">catch</span> (<span class="cls">InsufficientStockException</span> ise) {
+    System.<span class="fn">debug</span>(<span class="st">'Stock error: '</span> + ise.<span class="fn">getMessage</span>());
+}
+
+<span class="kw">try</span> {
+    inv.<span class="fn">sell</span>(<span class="st">'Tablet'</span>, <span class="nm">1</span>);          <span class="cm">// ❌ Product doesn't exist!</span>
+} <span class="kw">catch</span> (<span class="cls">InsufficientStockException</span> ise) {
+    System.<span class="fn">debug</span>(<span class="st">'Stock error: '</span> + ise.<span class="fn">getMessage</span>());
+}</pre>
+  </div>
+  <div class="output-wrap">
+    <div class="output-header">OUTPUT</div>
+<pre>Sold 3x Laptop  →  Remaining: 2
+Stock error: Only 3 of "Headphone" in stock. Requested: 5
+Stock error: Product not found: Tablet</pre>
+  </div>
+</section>
+
+<!-- ════════════ COLLECTIONS DEEP DIVE ════════════ -->
+<section class="section" id="collections">
+  <div class="section-label">// OOP Deep Dive · Part 4</div>
+  <h2>📚 Collections Deep Dive — List, Set &amp; Map in Detail</h2>
+
+  <p>You saw these briefly in the Data Types section. Now let's go <em>deep</em> — every method you need, every pattern you'll use daily.</p>
+
+  <h3>📋 List — Your Go-To Ordered Collection</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">ListDeepDive.apex</span></div>
+<pre><span class="ty">List</span>&lt;<span class="ty">String</span>&gt; cities = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt;();
+
+<span class="cm">// ── Adding items ──</span>
+cities.<span class="fn">add</span>(<span class="st">'Mumbai'</span>);          <span class="cm">// add to end</span>
+cities.<span class="fn">add</span>(<span class="st">'Delhi'</span>);
+cities.<span class="fn">add</span>(<span class="st">'Bangalore'</span>);
+cities.<span class="fn">add</span>(<span class="nm">1</span>, <span class="st">'Chennai'</span>);      <span class="cm">// insert at index 1 — shifts others right</span>
+System.<span class="fn">debug</span>(cities);           <span class="cm">// [Mumbai, Chennai, Delhi, Bangalore]</span>
+
+<span class="cm">// ── Reading items ──</span>
+System.<span class="fn">debug</span>(cities[<span class="nm">0</span>]);         <span class="cm">// Mumbai (index starts at 0!)</span>
+System.<span class="fn">debug</span>(cities.<span class="fn">get</span>(<span class="nm">2</span>));    <span class="cm">// Delhi</span>
+System.<span class="fn">debug</span>(cities.<span class="fn">size</span>());    <span class="cm">// 4</span>
+
+<span class="cm">// ── Checking ──</span>
+System.<span class="fn">debug</span>(cities.<span class="fn">contains</span>(<span class="st">'Delhi'</span>));    <span class="cm">// true</span>
+System.<span class="fn">debug</span>(cities.<span class="fn">isEmpty</span>());            <span class="cm">// false</span>
+System.<span class="fn">debug</span>(cities.<span class="fn">indexOf</span>(<span class="st">'Bangalore'</span>)); <span class="cm">// 3</span>
+
+<span class="cm">// ── Updating ──</span>
+cities.<span class="fn">set</span>(<span class="nm">0</span>, <span class="st">'Pune'</span>);          <span class="cm">// replace index 0: Mumbai → Pune</span>
+System.<span class="fn">debug</span>(cities[<span class="nm">0</span>]);         <span class="cm">// Pune</span>
+
+<span class="cm">// ── Removing ──</span>
+cities.<span class="fn">remove</span>(<span class="nm">1</span>);               <span class="cm">// remove by index (Chennai)</span>
+cities.<span class="fn">remove</span>(<span class="st">'Bangalore'</span>);      <span class="cm">// remove by value (Bangalore)</span>
+System.<span class="fn">debug</span>(cities);             <span class="cm">// [Pune, Delhi]</span>
+
+<span class="cm">// ── Sorting ──</span>
+<span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt; nums = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Integer</span>&gt;{ <span class="nm">40</span>, <span class="nm">10</span>, <span class="nm">30</span>, <span class="nm">20</span> };
+nums.<span class="fn">sort</span>();                     <span class="cm">// ascending by default</span>
+System.<span class="fn">debug</span>(nums);               <span class="cm">// [10, 20, 30, 40]</span>
+
+<span class="cm">// ── Clearing ──</span>
+cities.<span class="fn">clear</span>();
+System.<span class="fn">debug</span>(cities.<span class="fn">size</span>());     <span class="cm">// 0</span>
+
+<span class="cm">// ── Iterating — two ways ──</span>
+<span class="ty">List</span>&lt;<span class="ty">String</span>&gt; fruits = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">String</span>&gt;{ <span class="st">'Mango'</span>, <span class="st">'Apple'</span>, <span class="st">'Banana'</span> };
+
+<span class="cm">// Way 1: for-each (preferred — clean, safe)</span>
+<span class="kw">for</span> (<span class="ty">String</span> fruit : fruits) {
+    System.<span class="fn">debug</span>(<span class="st">'Fruit: '</span> + fruit);
+}
+
+<span class="cm">// Way 2: index-based (when you need the position)</span>
+<span class="kw">for</span> (<span class="ty">Integer</span> i = <span class="nm">0</span>; i < fruits.<span class="fn">size</span>(); i++) {
+    System.<span class="fn">debug</span>(<span class="st">'[</span>'</span> + i + <span class="st">'] '</span> + fruits[i]);
+}</pre>
+  </div>
+
+  <h3>🔵 Set — No Duplicates Allowed</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">SetDeepDive.apex</span></div>
+<pre><span class="ty">Set</span>&lt;<span class="ty">String</span>&gt; permissions = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">String</span>&gt;();
+
+permissions.<span class="fn">add</span>(<span class="st">'READ'</span>);
+permissions.<span class="fn">add</span>(<span class="st">'WRITE'</span>);
+permissions.<span class="fn">add</span>(<span class="st">'DELETE'</span>);
+permissions.<span class="fn">add</span>(<span class="st">'READ'</span>);    <span class="cm">// Duplicate — silently ignored!</span>
+permissions.<span class="fn">add</span>(<span class="st">'WRITE'</span>);   <span class="cm">// Duplicate — silently ignored!</span>
+System.<span class="fn">debug</span>(permissions.<span class="fn">size</span>());   <span class="cm">// 3 (not 5)</span>
+
+<span class="cm">// Checking</span>
+System.<span class="fn">debug</span>(permissions.<span class="fn">contains</span>(<span class="st">'DELETE'</span>));  <span class="cm">// true</span>
+System.<span class="fn">debug</span>(permissions.<span class="fn">contains</span>(<span class="st">'ADMIN'</span>));   <span class="cm">// false</span>
+
+<span class="cm">// Real-world pattern: collecting unique Account IDs from a list of Contacts</span>
+<span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; contacts = [<span class="kw">SELECT</span> Id, AccountId <span class="kw">FROM</span> <span class="ty">Contact</span> <span class="kw">LIMIT</span> <span class="nm">100</span>];
+
+<span class="ty">Set</span>&lt;<span class="ty">Id</span>&gt; uniqueAccountIds = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Id</span>&gt;();
+<span class="kw">for</span> (<span class="ty">Contact</span> c : contacts) {
+    <span class="kw">if</span> (c.AccountId != <span class="kw">null</span>) {
+        uniqueAccountIds.<span class="fn">add</span>(c.AccountId);   <span class="cm">// auto-deduplicates!</span>
+    }
+}
+<span class="cm">// Now query ONLY those unique accounts — efficient!</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; relatedAccounts = [<span class="kw">SELECT</span> Id, Name
+                                   <span class="kw">FROM</span> <span class="ty">Account</span>
+                                   <span class="kw">WHERE</span> Id <span class="kw">IN</span> :uniqueAccountIds];
+System.<span class="fn">debug</span>(<span class="st">'Unique accounts: '</span> + relatedAccounts.<span class="fn">size</span>());
+
+<span class="cm">// Set operations</span>
+<span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt; a = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt;{ <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span> };
+<span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt; b = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt;{ <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>, <span class="nm">6</span> };
+a.<span class="fn">retainAll</span>(b);    <span class="cm">// Intersection: keeps only items in BOTH</span>
+System.<span class="fn">debug</span>(a);    <span class="cm">// {3, 4}</span>
+
+<span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt; c = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt;{ <span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span> };
+<span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt; d = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Integer</span>&gt;{ <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span> };
+c.<span class="fn">addAll</span>(d);       <span class="cm">// Union: merge d INTO c</span>
+System.<span class="fn">debug</span>(c);    <span class="cm">// {1, 2, 3, 4, 5}</span></pre>
+  </div>
+
+  <h3>🟡 Map — The Power Tool for Lookups</h3>
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">MapDeepDive.apex</span></div>
+<pre><span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt; inventory = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">String</span>, <span class="ty">Integer</span>&gt;();
+
+<span class="cm">// ── Adding / Updating ──</span>
+inventory.<span class="fn">put</span>(<span class="st">'Apple'</span>,  <span class="nm">100</span>);
+inventory.<span class="fn">put</span>(<span class="st">'Mango'</span>,  <span class="nm">50</span>);
+inventory.<span class="fn">put</span>(<span class="st">'Banana'</span>, <span class="nm">200</span>);
+inventory.<span class="fn">put</span>(<span class="st">'Apple'</span>,  <span class="nm">120</span>);   <span class="cm">// Overwrites — Apple is now 120</span>
+
+<span class="cm">// ── Reading ──</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">get</span>(<span class="st">'Mango'</span>));           <span class="cm">// 50</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">get</span>(<span class="st">'Pineapple'</span>));       <span class="cm">// null (not found)</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">containsKey</span>(<span class="st">'Banana'</span>)); <span class="cm">// true</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">size</span>());               <span class="cm">// 3</span>
+
+<span class="cm">// ── Get all keys / values ──</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">keySet</span>());    <span class="cm">// {Apple, Banana, Mango}</span>
+System.<span class="fn">debug</span>(inventory.<span class="fn">values</span>());   <span class="cm">// [120, 200, 50] (unordered)</span>
+
+<span class="cm">// ── Iterating ──</span>
+<span class="kw">for</span> (<span class="ty">String</span> key : inventory.<span class="fn">keySet</span>()) {
+    System.<span class="fn">debug</span>(key + <span class="st">' → '</span> + inventory.<span class="fn">get</span>(key));
+}
+
+<span class="cm">// ── Real-world pattern: Map&lt;Id, SObject&gt; ──
+// THE most common pattern in Apex — index records by Id for O(1) lookup</span>
+<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; accountList = [<span class="kw">SELECT</span> Id, Name <span class="kw">FROM</span> <span class="ty">Account</span> <span class="kw">LIMIT</span> <span class="nm">50</span>];
+
+<span class="cm">// Build the map — key = Id, value = Account record</span>
+<span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt; accountMap = <span class="kw">new</span> <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt;(accountList);
+<span class="cm">// ↑ Shortcut constructor! Automatically uses the Id field as the key</span>
+
+<span class="cm">// Now look up ANY account by Id in constant time — no loop needed!</span>
+<span class="ty">Id</span> targetId = accountList[<span class="nm">0</span>].Id;
+<span class="ty">Account</span> found = accountMap.<span class="fn">get</span>(targetId);   <span class="cm">// Instant lookup!</span>
+System.<span class="fn">debug</span>(<span class="st">'Found: '</span> + found.Name);</pre>
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Feature</th><th>List</th><th>Set</th><th>Map</th></tr>
+    <tr><td>Ordered?</td><td>✅ Yes</td><td>❌ No</td><td>❌ No (keys)</td></tr>
+    <tr><td>Allows duplicates?</td><td>✅ Yes</td><td>❌ No</td><td>Keys: No / Values: Yes</td></tr>
+    <tr><td>Access by index?</td><td>✅ <code>list[0]</code></td><td>❌</td><td>✅ <code>map.get(key)</code></td></tr>
+    <tr><td>Best for</td><td>Ordered data, DML batches</td><td>Unique IDs, dedup</td><td>Fast lookups by key</td></tr>
+  </table>
+  </div>
+</section>
+
+<!-- ════════════ TRIGGERS ════════════ -->
+<section class="section" id="triggers">
+  <div class="section-label">// Salesforce Specific</div>
+  <h2>⚡ Apex Triggers — Code That Runs on Record Changes</h2>
+
+  <div class="analogy">
+    <div class="analogy-label">🌍 Real-world analogy</div>
+    A <strong>trigger</strong> is like a motion-sensor light in a room: when something happens (someone enters = record is inserted/updated/deleted), the light automatically turns on (your code runs). You don't press any button — it fires on its own in response to a database event.
+  </div>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Event</th><th>When it fires</th></tr>
+    <tr><td><code>before insert</code></td><td>BEFORE a new record is saved — use to validate or set default field values</td></tr>
+    <tr><td><code>after insert</code></td><td>AFTER a new record is saved — use to create related records (Id is available)</td></tr>
+    <tr><td><code>before update</code></td><td>BEFORE an existing record is changed — use to validate changes</td></tr>
+    <tr><td><code>after update</code></td><td>AFTER an existing record is changed — use to update related records</td></tr>
+    <tr><td><code>before delete</code></td><td>BEFORE a record is deleted — use to prevent deletion or archive</td></tr>
+    <tr><td><code>after delete</code></td><td>AFTER a record is deleted</td></tr>
+    <tr><td><code>after undelete</code></td><td>AFTER a record is restored from Recycle Bin</td></tr>
+  </table>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">AccountTrigger.trigger</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// A trigger lives in /force-app/main/default/triggers/
+// File is .trigger, not .cls
+// Syntax: trigger TriggerName on ObjectName (events)
+// ─────────────────────────────────────────────</span>
+<span class="kw">trigger</span> <span class="cls">AccountTrigger</span> <span class="kw">on</span> <span class="ty">Account</span> (<span class="kw">before insert</span>, <span class="kw">before update</span>,
+                                     <span class="kw">after insert</span>,  <span class="kw">after update</span>) {
+    <span class="cm">// Best practice: Triggers should be THIN — just call a handler class.
+    // Never put business logic directly inside the trigger itself!</span>
+    <span class="cls">AccountTriggerHandler</span>.<span class="fn">handle</span>(Trigger.new, Trigger.old,
+                                      Trigger.newMap, Trigger.oldMap,
+                                      Trigger.isInsert, Trigger.isUpdate,
+                                      Trigger.isBefore, Trigger.isAfter);
+}</pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-header"><div class="code-dots"><span></span><span></span><span></span></div><span class="code-title">AccountTriggerHandler.cls — The Handler Class</span></div>
+<pre><span class="cm">// ─────────────────────────────────────────────
+// TRIGGER CONTEXT VARIABLES — automatically available in every trigger
+//
+// Trigger.new     → List of NEW records (insert/update)
+// Trigger.old     → List of OLD records before change (update/delete)
+// Trigger.newMap  → Map<Id, SObject> of new records
+// Trigger.oldMap  → Map<Id, SObject> of old records
+// Trigger.isInsert / isUpdate / isDelete / isUndelete
+// Trigger.isBefore / isAfter
+// Trigger.size    → how many records are being processed
+// ─────────────────────────────────────────────</span>
+
+<span class="kw">public with sharing class</span> <span class="cls">AccountTriggerHandler</span> {
+
+    <span class="kw">public static</span> <span class="ty">void</span> <span class="fn">handle</span>(
+        <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; newList,
+        <span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; oldList,
+        <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt; newMap,
+        <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt; oldMap,
+        <span class="ty">Boolean</span> isInsert,
+        <span class="ty">Boolean</span> isUpdate,
+        <span class="ty">Boolean</span> isBefore,
+        <span class="ty">Boolean</span> isAfter
+    ) {
+        <span class="kw">if</span> (isBefore && isInsert)  <span class="fn">beforeInsert</span>(newList);
+        <span class="kw">if</span> (isBefore && isUpdate)  <span class="fn">beforeUpdate</span>(newList, oldMap);
+        <span class="kw">if</span> (isAfter  && isInsert)  <span class="fn">afterInsert</span>(newList);
+        <span class="kw">if</span> (isAfter  && isUpdate)  <span class="fn">afterUpdate</span>(newList, oldMap);
+    }
+
+    <span class="cm">// ── BEFORE INSERT: set default values before saving ──</span>
+    <span class="kw">private static</span> <span class="ty">void</span> <span class="fn">beforeInsert</span>(<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; newAccounts) {
+        <span class="kw">for</span> (<span class="ty">Account</span> acc : newAccounts) {
+            <span class="cm">// Auto-set Rating to 'Warm' if no Rating provided</span>
+            <span class="kw">if</span> (acc.Rating == <span class="kw">null</span>) {
+                acc.Rating = <span class="st">'Warm'</span>;
+            }
+            <span class="cm">// Standardise phone format</span>
+            <span class="kw">if</span> (acc.Phone != <span class="kw">null</span>) {
+                acc.Phone = acc.Phone.<span class="fn">replaceAll</span>(<span class="st">[^0-9]</span>, <span class="st">''</span>);
+            }
+        }
+    }
+
+    <span class="cm">// ── BEFORE UPDATE: compare old vs new, reject invalid changes ──</span>
+    <span class="kw">private static</span> <span class="ty">void</span> <span class="fn">beforeUpdate</span>(<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; newList,
+                                        <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt; oldMap) {
+        <span class="kw">for</span> (<span class="ty">Account</span> newAcc : newList) {
+            <span class="ty">Account</span> oldAcc = oldMap.<span class="fn">get</span>(newAcc.Id);   <span class="cm">// get old version</span>
+
+            <span class="cm">// Business rule: don't allow removing a phone number once set</span>
+            <span class="kw">if</span> (oldAcc.Phone != <span class="kw">null</span> && newAcc.Phone == <span class="kw">null</span>) {
+                <span class="cm">// addError() blocks the save and shows a user-friendly message</span>
+                newAcc.<span class="fn">addError</span>(<span class="st">'Cannot remove a phone number once it is set.'</span>);
+            }
+
+            <span class="cm">// Detect if Rating actually changed (avoid processing unchanged records)</span>
+            <span class="kw">if</span> (newAcc.Rating != oldAcc.Rating) {
+                System.<span class="fn">debug</span>(<span class="st">'Rating changed from '</span> + oldAcc.Rating
+                           + <span class="st">' to '</span> + newAcc.Rating);
+            }
+        }
+    }
+
+    <span class="cm">// ── AFTER INSERT: create related records (Id is now available) ──</span>
+    <span class="kw">private static</span> <span class="ty">void</span> <span class="fn">afterInsert</span>(<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; newAccounts) {
+        <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt; defaultContacts = <span class="kw">new</span> <span class="ty">List</span>&lt;<span class="ty">Contact</span>&gt;();
+        <span class="kw">for</span> (<span class="ty">Account</span> acc : newAccounts) {
+            <span class="cm">// Auto-create a default contact for every new account</span>
+            defaultContacts.<span class="fn">add</span>(<span class="kw">new</span> <span class="ty">Contact</span>(
+                LastName  = <span class="st">'Primary Contact'</span>,
+                AccountId = acc.Id    <span class="cm">// acc.Id is available because we're after insert</span>
+            ));
+        }
+        <span class="kw">if</span> (!defaultContacts.<span class="fn">isEmpty</span>()) {
+            <span class="kw">insert</span> defaultContacts;
+        }
+    }
+
+    <span class="cm">// ── AFTER UPDATE: sync changes to related records ──</span>
+    <span class="kw">private static</span> <span class="ty">void</span> <span class="fn">afterUpdate</span>(<span class="ty">List</span>&lt;<span class="ty">Account</span>&gt; newList,
+                                       <span class="ty">Map</span>&lt;<span class="ty">Id</span>, <span class="ty">Account</span>&gt; oldMap) {
+        <span class="ty">Set</span>&lt;<span class="ty">Id</span>&gt; changedIds = <span class="kw">new</span> <span class="ty">Set</span>&lt;<span class="ty">Id</span>&gt;();
+        <span class="kw">for</span> (<span class="ty">Account</span> acc : newList) {
+            <span class="cm">// Only process accounts where Name actually changed</span>
+            <span class="kw">if</span> (acc.Name != oldMap.<span class="fn">get</span>(acc.Id).Name) {
+                changedIds.<span class="fn">add</span>(acc.Id);
+            }
+        }
+        System.<span class="fn">debug</span>(<span class="st">'Accounts with changed names: '</span> + changedIds.<span class="fn">size</span>());
+    }
+}</pre>
+  </div>
+</section>
+
+<!-- ════════════ HOW SFDC DEV WORKS VISUAL ════════════ -->
+<section class="section" id="how-it-all-connects">
+  <div class="section-label">// The Big Picture</div>
+  <h2>🗺️ How Everything Connects — The Full Salesforce Developer Map</h2>
+
+  <p>Here's how all the pieces you've learned fit together into a real developer workflow:</p>
+
+  <div class="flow">
+    <div class="flow-box"><span>💻</span><b>VS Code</b><br>Write code locally</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span>🔧</span><b>SF CLI</b><br>Deploy / retrieve</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span>☁️</span><b>Dev Org</b><br>Runs in cloud</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span>📋</span><b>Debug Log</b><br>Check output</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span>✅</span><b>Tests</b><br>Verify coverage</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-box"><span>🚀</span><b>Production</b><br>Deploy live</div>
+  </div>
+
+  <h3>🧩 How Apex Layers Connect</h3>
+
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Layer</th><th>Technology</th><th>What it does</th><th>File extension</th></tr>
+    <tr><td>Data Model</td><td>Objects &amp; Fields</td><td>Defines what data you store (like DB tables)</td><td><code>.object-meta.xml</code></td></tr>
+    <tr><td>Business Logic</td><td>Apex Classes</td><td>The rules and automation for your data</td><td><code>.cls</code></td></tr>
+    <tr><td>Database Events</td><td>Apex Triggers</td><td>Code that auto-runs when records change</td><td><code>.trigger</code></td></tr>
+    <tr><td>User Interface</td><td>LWC / Aura</td><td>Web components for Salesforce pages</td><td><code>.js, .html, .css</code></td></tr>
+    <tr><td>REST API</td><td><code>@RestResource</code></td><td>Exposes Apex as an HTTP endpoint</td><td><code>.cls</code></td></tr>
+    <tr><td>Async Processing</td><td>Batch, Queueable, Future</td><td>Long-running or background operations</td><td><code>.cls</code></td></tr>
+    <tr><td>Scheduled Jobs</td><td>Schedulable</td><td>Code that runs on a cron-like schedule</td><td><code>.cls</code></td></tr>
+  </table>
+  </div>
+
+  <h3>📺 Recommended Learning Path After This Guide</h3>
+  <div class="tbl-wrap">
+  <table>
+    <tr><th>Step</th><th>Topic</th><th>Where to Learn</th></tr>
+    <tr><td>1</td><td>Trailhead — Apex Basics module</td><td><code>trailhead.salesforce.com</code> (free, interactive)</td></tr>
+    <tr><td>2</td><td>SOQL deep dive (relationships, aggregate queries)</td><td>Trailhead — SOQL Basics trail</td></tr>
+    <tr><td>3</td><td>Apex Triggers &amp; Trigger Framework</td><td>Trailhead — Apex Triggers module</td></tr>
+    <tr><td>4</td><td>Test Classes &amp; Code Coverage</td><td>Trailhead — Apex Testing module</td></tr>
+    <tr><td>5</td><td>Asynchronous Apex (Batch, Future, Queueable)</td><td>Trailhead — Async Apex module</td></tr>
+    <tr><td>6</td><td>Lightning Web Components</td><td>Trailhead — LWC Basics trail</td></tr>
+    <tr><td>7</td><td>Platform Developer I Certification</td><td><code>trailhead.salesforce.com/credentials</code></td></tr>
+  </table>
+  </div>
+
+  <div class="note"><strong>🎯 The single best thing you can do right now:</strong> Open <code>trailhead.salesforce.com</code>, search for "Apex Basics &amp; Database", and work through every hands-on challenge. Trailhead connects directly to your Developer Org, so you write real code that gets auto-graded. It's how every professional Salesforce developer learned.</div>
+</section>
+
 
 <script>
   // scroll progress bar
@@ -1577,6 +3387,20 @@ Heap used (bytes): 8192</pre>
     const h = d.scrollHeight - d.clientHeight;
     document.getElementById('progress').style.width = (s/h*100) + '%';
   });
+
+  // Sidebar active section highlight
+  const sections = document.querySelectorAll('.section[id]');
+  const navLinks = document.querySelectorAll('.sidebar-toc a');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector('.sidebar-toc a[href="#' + entry.target.id + '"]');
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  sections.forEach(s => observer.observe(s));
 </script>
 </body>
 </html>
